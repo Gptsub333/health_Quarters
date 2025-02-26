@@ -25,7 +25,7 @@ export function Benefits({ content }) {
               <h3 className="text-2xl font-bold">Transforming Healthcare Together</h3>
               <p className="text-gray-600">
                 Our ecosystem brings together innovative minds, cutting-edge technology, and comprehensive support to
-                drive meaningful change in healthcare. Through collaboration and continuous learning, we're building the
+                drive meaningful change in healthcare. Through collaboration and continuous learning, we are building the
                 future of healthcare innovation.
               </p>
               <ul className="space-y-2 text-gray-600">
