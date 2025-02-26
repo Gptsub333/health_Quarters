@@ -48,12 +48,17 @@ export function Benefits({ content }) {
 
         <div className="grid gap-8 md:grid-cols-2">
           {content.cards.map((card, index) => (
-            <Card key={index} className={index === 1 || index === 2 ? "bg-[#1E2B58] text-white" : ""}>
-              <CardContent className="p-8">
-                <h3 className="mb-4 text-2xl font-bold">{card.title}</h3>
-                <p className={index === 1 || index === 2 ? "text-gray-300" : "text-gray-600"}>{card.description}</p>
-              </CardContent>
-            </Card>
+            <Card 
+            key={index} 
+            className="bg-white text-gray-800 transition-all duration-300 hover:shadow-lg hover:bg-gray-50"
+          >
+            <CardContent className="p-4 sm:p-6 md:p-8">
+              <h3 className="mb-2 sm:mb-3 md:mb-4 text-xl sm:text-2xl font-bold leading-tight">{card.title}</h3>
+              <p className="text-sm sm:text-base text-gray-600">
+                {card.description}
+              </p>
+            </CardContent>
+          </Card>
           ))}
         </div>
       </div>
