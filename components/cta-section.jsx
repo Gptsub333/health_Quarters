@@ -37,27 +37,6 @@ export function CtaSection({ content }) {
               </Button>
           </div>
         </div>
-
-        <div className="mt-32 flex flex-col items-center justify-between md:flex-row">
-       
-
-          <div className="mt-4 text-gray-500 md:mt-0">{content.copyright}</div>
-
-          <div className="mt-4 md:mt-0">
-            <a href="#" className="flex items-center gap-2 text-gray-500 hover:text-gray-700">
-              {content.terms}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M7 17L17 7M17 7H7M17 7V17"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
-          </div>
-        </div>
       </div>
     </section>
   )

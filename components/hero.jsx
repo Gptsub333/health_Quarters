@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { useRouter } from "next/navigation";
 
 export function Hero({ content }) {
+  const router = useRouter();
   return (
     <section className="min-h-screen bg-gradient-to-br from-pink-50 to-yellow-50 px-4 py-8 sm:py-12 md:py-16 md:px-8 mb-10 sm:mb-16 md:mb-20 overflow-hidden">
       <div className="mx-auto w-full sm:w-[90%] md:w-[85%] lg:w-[80%] max-w-[1700px]">
@@ -23,7 +25,7 @@ export function Hero({ content }) {
             </h1>
             <p className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-600">{content.description}</p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Button size="lg" className="bg-[#6C5CE7] hover:bg-[#5A4ED1] p-3 sm:p-4 md:p-5 px-6 sm:px-8 md:px-[3rem] text-white rounded-full sm:rounded-[150px] text-sm sm:text-base">
+              <Button onClick={() => router.push("/form")} size="lg" className="bg-[#6C5CE7] hover:bg-[#5A4ED1] p-3 sm:p-4 md:p-5 px-6 sm:px-8 md:px-[3rem] text-white rounded-full sm:rounded-[150px] text-sm sm:text-base">
                 {content.cta}
               </Button>
               <Button
