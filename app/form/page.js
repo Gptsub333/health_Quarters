@@ -7,6 +7,7 @@ import { format } from "date-fns"
 import { CalendarIcon, Upload } from "lucide-react"
 import Input from "@/components/ui/input";
 
+
 // Utility function
 const cn = (...classes) => {
   return classes.filter(Boolean).join(" ")
@@ -396,15 +397,67 @@ export default function FormPage() {
   ];
 
   const onSubmit = async (data) => {
-    // Simulate form submission
-    console.log("Form data:", data)
+    // Prevent default form behavior
+    event.preventDefault();
+  
+    // Format dates
+    const formattedInceptionDate = inceptionDate ? format(inceptionDate, "yyyy-MM-dd") : "";
+  
+    // Create form data object
+    const formData = {
+      firstName: data.founderFirstName,
+      lastName: data.founderLastName,
+      email: data.email,
+      companyName: data.companyName,
+      website: data.companyWebsite,
+      hearAboutUs: data.referralSource || data.otherReferralSource || "",
+      description: data.companyDescription,
+      problem: data.problemSolved,
+      solution: data.solution,
+      businessModel: data.businessModel || data.otherBusinessModel || "",
+      inceptionDate: formattedInceptionDate,
+      currentStage: data.referralSource,
+      industry: data.industry,
+      sector: data.sector || data.otherSector || "",
+      city: data.city,
+      state: data.stateProvince,
+      zipCode: data.postalCode,
+      country: data.country,
+      financialInstrument: data.financialInstrument || data.otherFinancialInstrument || "",
+      raisingCapital: data.isRaisingCapital,
+      capitalRaised: data.totalCapitalRaised,
+      employees: data.fullTimeEmployees,
+      parttimeEmployees: data.partTimeStaff,
+      lastYearRevenue: data.lastYearRevenue,
+      customers: data.payingCustomers,
+      pilotCustomers: data.pilotPrograms,
+      logo: logoFile ? logoFile.name : "",
+      pitchDeck: deckFile ? deckFile.name : "",
+      pitchDeckLink: data.deckLink,
+      pitchVideoLink: data.pitchVideo
+    };
+  
+    try {
+      const response = await fetch("http://localhost:8000/upload_to_sheet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+  
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Success:", responseData);
+        setIsSubmitted(true);
+      } else {
+        console.error("Error submitting form");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
 
-    // Add a small delay to simulate processing
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    // Show success message
     setIsSubmitted(true)
-  }
+  };
+  
 
   const handleFileChange = (e, type) => {
     if (e.target.files && e.target.files[0]) {
@@ -591,86 +644,6 @@ export default function FormPage() {
                       This form will take roughly 10 minutes to complete. We review applications monthly. We will not share
                       your personal information without permission, except when required by law.
                     </div>
-                    {/* <div className="w-full max-w-md mx-auto">
-                      <div className="space-y-2">
-                        <Label 
-                          htmlFor="submissionDate" 
-                          className="text-sm font-medium tracking-wide text-gray-700 flex items-center"
-                        >
-                          Submission Date *
-                        </Label>
-                        
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button
-                              type="button"
-                              className={cn(
-                                "w-full px-4 py-2.5 flex items-center justify-between rounded-md border bg-white transition-all duration-200",
-                                "hover:border-blue-400 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500",
-                                !submissionDate && "text-gray-500"
-                              )}
-                            >
-                              <div className="flex items-center">
-                                <svg 
-                                  className={cn(
-                                    "mr-2 h-5 w-5 transition-colors", 
-                                    submissionDate ? "text-blue-600" : "text-gray-400"
-                                  )} 
-                                  xmlns="http://www.w3.org/2000/svg" 
-                                  viewBox="0 0 24 24" 
-                                  fill="none" 
-                                  stroke="currentColor" 
-                                  strokeWidth="2" 
-                                  strokeLinecap="round" 
-                                  strokeLinejoin="round"
-                                >
-                                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                <span className={cn(
-                                  "font-medium", 
-                                  submissionDate ? "text-gray-800" : "text-gray-500"
-                                )}>
-                                  {submissionDate ? format(submissionDate, "dd MMMM, yyyy") : "Select date"}
-                                </span>
-                              </div>
-                              <svg 
-                                className="h-5 w-5 text-gray-400" 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                viewBox="0 0 24 24" 
-                                fill="none" 
-                                stroke="currentColor" 
-                                strokeWidth="2" 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round"
-                              >
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                              </svg>
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent className="p-0 border border-gray-200 rounded-md shadow-lg">
-                            <div className="p-1 bg-white rounded-md">
-                              <Calendar
-                                mode="single"
-                                selected={submissionDate}
-                                onSelect={(date) => {
-                                  setSubmissionDate(date);
-                                  setValue("submissionDate", date);
-                                }}
-                                initialFocus
-                                className="rounded-md border-0"
-                              />
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                        
-                        <p className="text-xs text-gray-500 italic mt-1">
-                          Please select the submission deadline date
-                        </p>
-                      </div>
-                    </div> */}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 

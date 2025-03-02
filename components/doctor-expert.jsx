@@ -6,7 +6,7 @@ import { Award, Users, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"; // Import useRouter
 
 export default function DoctorExpertsSection() {
-  const [ setIsHovered] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const router = useRouter(); // Initialize router
 
@@ -103,29 +103,29 @@ export default function DoctorExpertsSection() {
               and make a meaningful impact on patient care worldwide.
             </motion.p>
 
-            <motion.div
-      className="pt-4"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-      viewport={{ once: true }}
-    >
-      <motion.button
-        onClick={() => router.push("/doctor-form")} // Navigate on click
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.98 }}
-        className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 p-0.5 font-medium text-white shadow-md transition-all duration-300 ease-out hover:shadow-lg"
-      >
-        <span className="relative flex items-center gap-2 rounded-md bg-white px-6 py-3.5 transition-all duration-300 ease-out group-hover:bg-opacity-0">
-          <span className="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 group-hover:text-white transition-colors duration-300">
-            Register as an Expert
-          </span>
-          <ArrowRight className="h-4 w-4 text-indigo-600 group-hover:text-white transition-colors duration-300" />
-        </span>
-      </motion.button>
-    </motion.div>
+
+          <motion.button
+            onClick={() => router.push("/doctor-form")}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+            className={`group relative inline-flex items-center justify-center overflow-hidden rounded-lg p-0.5 font-medium shadow-md transition-all duration-300 ease-out hover:shadow-lg ${
+              isHovered ? "bg-purple-700" : "bg-indigo-600"
+            }`}
+          >
+            <span className="relative flex items-center gap-2 rounded-md bg-white px-6 py-3.5 transition-all duration-300 ease-out group-hover:bg-opacity-0">
+              <span
+                className={`text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 group-hover:text-white transition-colors duration-300 ${
+                  isHovered ? "text-purple-200" : "text-indigo-800"
+                }`}
+              >
+                Register as an Expert
+              </span>
+              <ArrowRight className="h-4 w-4 text-indigo-600 group-hover:text-white transition-colors duration-300" />
+            </span>
+          </motion.button>
+
 
 
             <motion.div

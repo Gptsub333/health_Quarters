@@ -2,10 +2,13 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useRouter } from "next/navigation";
+
 
 export default function MonthlyMeetups() {
   const [selectedMeetup, setSelectedMeetup] = useState(null)
-  const [showAll, setShowAll] = useState(false)
+  const [showAll] = useState(false)
+  const router = useRouter();
 
   // Sample data - In real app, this would come from your API
   const meetups = [
@@ -136,12 +139,12 @@ export default function MonthlyMeetups() {
             className="mt-12 text-center"
           >
             <button
-              onClick={() => setShowAll(!showAll)}
+              onClick={() => router.push("/meetup-page")}
               className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 p-0.5 font-medium text-white shadow-md transition-all duration-300 ease-out hover:shadow-lg"
             >
               <span className="relative flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm transition-all duration-300 ease-out group-hover:bg-opacity-0">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 group-hover:text-white transition-colors duration-300">
-                  {showAll ? "Show Less" : "View All Meetups"}
+                  {showAll ? "View All Meetups" : "View All Meetups"}
                 </span>
                 <svg
                   className="h-4 w-4 text-indigo-600 group-hover:text-white transition-colors duration-300"

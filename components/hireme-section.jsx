@@ -2,10 +2,13 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation";
+
 
 export default function MentorTypes() {
   const [hoveredCard, setHoveredCard] = useState(null)
-  const [showAll, setShowAll] = useState(false)
+  const [showAll] = useState(false)
+  const router = useRouter();
 
   const mentorTypes = [
     {
@@ -175,11 +178,11 @@ export default function MentorTypes() {
           className="mt-12 text-center"
         >
           <button
-            onClick={() => setShowAll(!showAll)}
+            onClick={() => router.push("/healthcare-experts")}
             className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-r from-purple-600 to-blue-600 p-0.5 font-medium text-gray-900 hover:text-white"
           >
             <span className="relative flex items-center gap-2 rounded-full bg-white px-6 py-3 transition-all duration-300 ease-out group-hover:bg-opacity-0">
-              {showAll ? 'Show Less' : 'View All Programs'}
+              {showAll ? 'View All Programs' : 'View All Programs'}
               <svg
                 className="h-4 w-4"
                 fill="none"
