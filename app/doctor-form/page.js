@@ -1,9 +1,7 @@
 "use client"
 
-import React from "react"
-
 import { useState } from "react"
-import { useRouter } from "next/navigation"; // ✅ Import useRouter
+import { useRouter } from "next/navigation" // ✅ Import useRouter
 import { motion, AnimatePresence } from "framer-motion"
 
 export default function DoctorRegistrationForm() {
@@ -23,13 +21,24 @@ export default function DoctorRegistrationForm() {
     image: null,
     documents: null,
     terms: false,
+    hourlyRate: "",
+    availableDays: {
+      monday: false,
+      tuesday: false,
+      wednesday: false,
+      thursday: false,
+      friday: false,
+      saturday: false,
+      sunday: false,
+    },
+    designation: "",
+    category: "",
   })
 
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [focusedField, setFocusedField] = useState("")
-  const router = useRouter(); // ✅ Initialize router
-
+  const router = useRouter() // ✅ Initialize router
 
   const handleInputFocus = (fieldName) => {
     setFocusedField(fieldName)
@@ -42,13 +51,13 @@ export default function DoctorRegistrationForm() {
   const handleInputChange = (e) => {
     const { name, value, type } = e.target
     if (type === "file") {
-      const fileInput = e.target 
+      const fileInput = e.target
       setFormData((prev) => ({
         ...prev,
         [name]: fileInput.files?.[0] || null,
       }))
     } else if (type === "checkbox") {
-      const checkbox = e.target 
+      const checkbox = e.target
       setFormData((prev) => ({
         ...prev,
         [name]: checkbox.checked,
@@ -61,20 +70,87 @@ export default function DoctorRegistrationForm() {
     }
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true);
-    router.push("/");
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsSubmitting(false);
     
 
-    // Handle success
-  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Prepare the form data
+    const doctorData = {
+      Title: formData.title,
+      FirstName: formData.firstName,
+      LastName: formData.lastName,
+      Email: formData.email,
+      Phone: formData.phone,
+      Specialization: formData.specialization,
+      Experience: formData.experience,
+      LicenseNumber: formData.license,
+      Hospital: formData.hospital,
+      City: formData.city,
+      Country: formData.country,
+      Bio: formData.bio,
+      HourlyRate: formData.hourlyRate,
+      AvailableDays: Object.keys(formData.availableDays)
+        .filter(day => formData.availableDays[day])
+        .join(','),
+      Designation: formData.designation,
+      Category: formData.category,
+      TermsAccepted: formData.terms
+    };
+    
+    // Create FormData object for file uploads
+    const fileData = new FormData();
+    
+    // Append all the text data
+    Object.keys(doctorData).forEach(key => {
+      fileData.append(key, doctorData[key]);
+    });
+    
+    // Append files if they exist
+    if (formData.image) {
+      fileData.append('ProfileImage', formData.image);
+    }
+    
+    if (formData.documents) {
+      fileData.append('LicenseDocument', formData.documents);
+    }
+    router.push("/")
+    
+    try {
+      // For JSON data (if not uploading files)
+      // const response = await fetch("YOUR_API_ENDPOINT", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(doctorData),
+      // });
+      
+      // For FormData (with file uploads)
+      const response = await fetch("YOUR_API_ENDPOINT", {
+        method: "POST",
+        body: fileData,
+        // Don't set Content-Type header when sending FormData
+      });
+      
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Registration successful:", responseData);
+        // Redirect to confirmation page or dashboard
+        router.push("/registration-success");
+      } else {
+        console.error("Error submitting form");
+        // Handle error state
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setIsSubmitting(false);
+    }
+  };
 
   const nextStep = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, 3))
+    setCurrentStep((prev) => Math.min(prev + 1, 4))
   }
 
   const prevStep = () => {
@@ -89,6 +165,79 @@ export default function DoctorRegistrationForm() {
       {children}
     </div>
   )
+
+  const categories = [
+    {
+      id: 1,
+      title: "Clinical Leadership",
+      description: "Expert guidance in medical leadership and clinical excellence",
+      expertise: ["Hospital Management", "Clinical Protocols", "Team Leadership"],
+      members: 48,
+      rating: 4.9,
+      gradient: "from-rose-400 to-orange-400",
+      shadowColor: "shadow-rose-200",
+    },
+    {
+      id: 2,
+      title: "Research & Innovation",
+      description: "Pioneering medical research and breakthrough innovations",
+      expertise: ["Clinical Trials", "Research Methods", "Data Analysis"],
+      members: 35,
+      rating: 4.8,
+      gradient: "from-blue-400 to-cyan-400",
+      shadowColor: "shadow-blue-200",
+    },
+    {
+      id: 3,
+      title: "Healthcare Technology",
+      description: "Digital transformation in healthcare delivery",
+      expertise: ["Digital Health", "AI in Medicine", "Health Informatics"],
+      members: 42,
+      rating: 4.7,
+      gradient: "from-violet-400 to-purple-400",
+      shadowColor: "shadow-violet-200",
+    },
+    {
+      id: 4,
+      title: "Patient Care Excellence",
+      description: "Advanced patient care and experience optimization",
+      expertise: ["Patient Experience", "Care Protocols", "Quality Metrics"],
+      members: 56,
+      rating: 4.9,
+      gradient: "from-emerald-400 to-teal-400",
+      shadowColor: "shadow-emerald-200",
+    },
+    {
+      id: 5,
+      title: "Medical Education",
+      description: "Training and development in healthcare",
+      expertise: ["Clinical Training", "Medical Education", "Skill Development"],
+      members: 39,
+      rating: 4.8,
+      gradient: "from-amber-400 to-yellow-400",
+      shadowColor: "shadow-amber-200",
+    },
+    {
+      id: 6,
+      title: "Healthcare Strategy",
+      description: "Strategic planning and healthcare management",
+      expertise: ["Strategic Planning", "Healthcare Policy", "Operations"],
+      members: 31,
+      rating: 4.7,
+      gradient: "from-pink-400 to-rose-400",
+      shadowColor: "shadow-pink-200",
+    },
+  ]
+
+  const handleDayChange = (day) => {
+    setFormData((prev) => ({
+      ...prev,
+      availableDays: {
+        ...prev.availableDays,
+        [day]: !prev.availableDays[day],
+      },
+    }))
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -116,7 +265,7 @@ export default function DoctorRegistrationForm() {
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex justify-between items-center">
-            {[1, 2, 3].map((step) => (
+            {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex-1">
                 <div className="relative">
                   <div className="flex items-center justify-center">
@@ -130,10 +279,16 @@ export default function DoctorRegistrationForm() {
                     </motion.div>
                   </div>
                   <div className="text-xs text-center mt-2 font-medium text-gray-600">
-                    {step === 1 ? "Personal Info" : step === 2 ? "Professional Details" : "Documents"}
+                    {step === 1
+                      ? "Personal Info"
+                      : step === 2
+                        ? "Professional Details"
+                        : step === 3
+                          ? "Category"
+                          : "Documents"}
                   </div>
                 </div>
-                {step < 3 && (
+                {step < 4 && (
                   <div className="hidden sm:block absolute w-full top-5">
                     <div
                       className={`h-0.5 ${
@@ -287,6 +442,45 @@ export default function DoctorRegistrationForm() {
                       </InputWrapper>
                     </div>
 
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <InputWrapper label="Hourly Rate ($)" required>
+                        <input
+                          type="number"
+                          name="hourlyRate"
+                          value={formData.hourlyRate}
+                          onChange={handleInputChange}
+                          onFocus={() => handleInputFocus("hourlyRate")}
+                          onBlur={handleInputBlur}
+                          className={`w-full px-4 py-2.5 rounded-lg border ${
+                            focusedField === "hourlyRate"
+                              ? "border-indigo-500 ring-2 ring-indigo-200"
+                              : "border-gray-300"
+                          } focus:outline-none transition-all duration-200`}
+                          required
+                          min="0"
+                          step="0.01"
+                        />
+                      </InputWrapper>
+
+                      <InputWrapper label="Designation" required>
+                        <input
+                          type="text"
+                          name="designation"
+                          value={formData.designation}
+                          onChange={handleInputChange}
+                          onFocus={() => handleInputFocus("designation")}
+                          onBlur={handleInputBlur}
+                          className={`w-full px-4 py-2.5 rounded-lg border ${
+                            focusedField === "designation"
+                              ? "border-indigo-500 ring-2 ring-indigo-200"
+                              : "border-gray-300"
+                          } focus:outline-none transition-all duration-200`}
+                          required
+                          placeholder="e.g. Senior Consultant, Head of Department"
+                        />
+                      </InputWrapper>
+                    </div>
+
                     <InputWrapper label="Medical License Number" required>
                       <input
                         type="text"
@@ -315,12 +509,113 @@ export default function DoctorRegistrationForm() {
                         } focus:outline-none transition-all duration-200`}
                       />
                     </InputWrapper>
+
+                    <InputWrapper label="Available Days" required>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
+                        {Object.keys(formData.availableDays).map((day) => (
+                          <div key={day} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id={day}
+                              checked={formData.availableDays[day]}
+                              onChange={() => handleDayChange(day)}
+                              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                            />
+                            <label htmlFor={day} className="ml-2 block text-sm text-gray-700 capitalize">
+                              {day}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </InputWrapper>
                   </motion.div>
                 )}
 
                 {currentStep === 3 && (
                   <motion.div
                     key="step3"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-6"
+                  >
+                    <InputWrapper label="Select Your Expertise Category" required>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                        {categories.map((category) => (
+                          <div
+                            key={category.id}
+                            onClick={() => setFormData((prev) => ({ ...prev, category: category.id.toString() }))}
+                            className={`relative rounded-xl overflow-hidden cursor-pointer transition-all duration-300 transform hover:-translate-y-1 ${
+                              formData.category === category.id.toString()
+                                ? "ring-2 ring-offset-2 ring-indigo-500 scale-[1.02]"
+                                : ""
+                            }`}
+                          >
+                            <div className={`bg-gradient-to-r ${category.gradient} p-5 ${category.shadowColor}`}>
+                              <h3 className="text-lg font-bold text-white mb-1">{category.title}</h3>
+                              <p className="text-white/90 text-sm mb-3">{category.description}</p>
+                              <div className="flex flex-wrap gap-2 mb-3">
+                                {category.expertise.map((item, idx) => (
+                                  <span key={idx} className="text-xs bg-white/20 text-white px-2 py-1 rounded-full">
+                                    {item}
+                                  </span>
+                                ))}
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-1">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-white"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                  <span className="text-xs text-white">{category.members} members</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-white"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                  </svg>
+                                  <span className="text-xs text-white">{category.rating}</span>
+                                </div>
+                              </div>
+                              {formData.category === category.id.toString() && (
+                                <div className="absolute top-3 right-3 bg-white rounded-full p-1">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-indigo-600"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </InputWrapper>
+                  </motion.div>
+                )}
+
+                {currentStep === 4 && (
+                  <motion.div
+                    key="step4"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
@@ -337,7 +632,7 @@ export default function DoctorRegistrationForm() {
                             aria-hidden="true"
                           >
                             <path
-                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
                               strokeWidth={2}
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -437,7 +732,7 @@ export default function DoctorRegistrationForm() {
                   </button>
                 )}
                 <div className="ml-auto">
-                  {currentStep < 3 ? (
+                  {currentStep < 4 ? (
                     <button
                       type="button"
                       onClick={nextStep}
