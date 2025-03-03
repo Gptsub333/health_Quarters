@@ -1,3 +1,6 @@
+import hq from '../public/images/bgremoved.png'
+import Image from "next/image"
+
 export function Footer({ content }) {
   return (
     <footer className="border-t bg-white px-4 py-8 md:py-12">
@@ -7,6 +10,8 @@ export function Footer({ content }) {
           <div className="flex flex-col">
             <div className="mb-4 text-xl sm:text-2xl md:text-[30px] font-extrabold bg-gradient-to-r from-[#1E2B58] to-[#6C5CE7] bg-clip-text text-transparent">
               HEALTHQUARTERS AI.
+              {/* HEALTHQUARTERS AI. */}
+              <Image src={hq} alt="My SVG Icon" width={200} height={200} />
             </div>
             <p className="text-sm text-gray-500 max-w-xs">
               Transforming healthcare through innovative AI solutions that empower providers and improve patient outcomes.

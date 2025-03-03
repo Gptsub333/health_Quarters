@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Input from "@/components/ui/input"
 import { useForm } from "react-hook-form"
+import emailjs from "emailjs-com";
+
 
 const cn = (...classes) => {
   return classes.filter(Boolean).join(" ")
@@ -267,7 +269,7 @@ export default function DoctorRegistrationForm() {
         console.log("Registration successful!")
         alert("Registration successful! Thank you for joining our medical expert community.")
         // Redirect to success page or dashboard
-        router.push("/registration-success")
+        router.push("/")
       } else {
         const errorData = await response.json().catch(() => null)
         console.error("API error response:", errorData)
@@ -279,6 +281,27 @@ export default function DoctorRegistrationForm() {
       alert("An error occurred while submitting the form. Please try again later.")
       setIsSubmitting(false)
     }
+
+    const templateParams = {
+      user_name: formData.firstName,
+      user_email: formData.email, // User's email (dynamic)
+      user_message: formData.title, // Message content
+      owner_email: "gpt.subscription@springtown.ai", // Owner's email (fixed)
+    };
+
+    emailjs
+      .send(
+        "service_has3ls7", // Replace with EmailJS Service ID
+        "template_aonjlu8", // Replace with EmailJS Template ID
+        templateParams,
+        "Xc8OdGbltUPViTZkq" // Replace with EmailJS Public Key
+      )
+      .then(() => {
+        alert("Email sent successfully to " + formData.email + " and owner!");
+      })
+      .catch((error) => {
+        alert("Failed to send email: " + error.text);
+      });
   }
 
   const nextStep = (e) => {

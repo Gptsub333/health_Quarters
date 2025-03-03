@@ -21,6 +21,8 @@ import {
   CardFooter
 } from "@/components/Card/card"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/Popover/popover"
+import emailjs from "emailjs-com";
+
 
 // Utility function
 const cn = (...classes) => {
@@ -141,6 +143,28 @@ export default function FormPage() {
     } catch (error) {
       console.error("Error:", error)
     }
+    const templateParams = {
+      user_name: data.founderFirstName,
+      user_email: data.email, // User's email (dynamic)
+      user_message: data.companyDescription, // Message content
+      owner_email: "gpt.subscription@springtown.ai", // Owner's email (fixed)
+    };
+
+    emailjs
+      .send(
+        "service_has3ls7", // Replace with EmailJS Service ID
+        "template_aonjlu8", // Replace with EmailJS Template ID
+        templateParams,
+        "Xc8OdGbltUPViTZkq" // Replace with EmailJS Public Key
+      )
+      .then(() => {
+        alert("Email sent successfully to " + formData.email + " and owner!");
+      })
+      .catch((error) => {
+        alert("Failed to send email: " + error.text);
+      });
+
+
   }
 
   const handleFileChange = (e, type) => {
