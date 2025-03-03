@@ -22,6 +22,8 @@ import {
 } from "@/components/Card/card"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/Popover/popover"
 import emailjs from "emailjs-com";
+import { useRouter } from "next/navigation"
+
 
 
 // Utility function
@@ -62,12 +64,12 @@ export default function FormPage() {
   const [deckFile, setDeckFile] = useState(null)
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isRaising, setIsRaising] = useState(false)
 
   const referralSource = watch("referralSource")
   const businessModel = watch("businessModel")
   const sector = watch("sector")
   const financialInstrument = watch("financialInstrument")
-  const isRaisingCapital = watch("isRaisingCapital")
   const [isOpen, setIsOpen] = useState(false) // State to control popover visibility
 
   const steps = [
@@ -102,7 +104,12 @@ export default function FormPage() {
     formData.append("ZipCode", data.postalCode)
     formData.append("Country", data.country)
     formData.append("FinancialInstrument", data.financialInstrument || data.otherFinancialInstrument || "")
-    formData.append("RaisingCapital", data.isRaisingCapital)
+    formData.append("RaisingCapital", isRaising)
+
+    // Add these lines to your FormData section
+    formData.append("RaiseAmount", data.raiseAmount || "")
+    formData.append("InstitutionalCapital", data.institutionalCapital || "")
+    formData.append("AnticipatedCloseDate", closingDate ? format(closingDate, "yyyy-MM-dd") : "")
     formData.append("CapitalRaised", data.totalCapitalRaised)
     formData.append("Employees", data.fullTimeEmployees)
     formData.append("ParttimeEmployees", data.partTimeStaff)
@@ -145,10 +152,35 @@ export default function FormPage() {
     }
     const templateParams = {
       user_name: data.founderFirstName,
+      user_name: `${data.founderFirstName} ${data.founderLastName}`,
       user_email: data.email, // User's email (dynamic)
       user_message: data.companyDescription, // Message content
       owner_email: "gpt.subscription@springtown.ai", // Owner's email (fixed)
+      company_name: data.companyName,
+      company_website: data.companyWebsite,
+      referral_source: data.referralSource || data.otherReferralSource || "N/A",
+      company_description: data.companyDescription,
+      problem_solved: data.problemSolved,
+      solution: data.solution,
+      business_model: data.businessModel || data.otherBusinessModel || "N/A",
+      inception_date: inceptionDate ? format(inceptionDate, "yyyy-MM-dd") : "N/A",
+      current_stage: data.stagevalue,
+      industry: data.industry,
+      sector: data.sector || data.otherSector || "N/A",
+      city: data.city,
+      state: data.stateProvince,
+      zip_code: data.postalCode,
+      country: data.country,
+      financial_instrument: data.financialInstrument || data.otherFinancialInstrument || "N/A",
+      raising_capital: data.isRaisingCapital ? "Yes" : "No",
+      capital_raised: data.totalCapitalRaised,
+      employees_fulltime: data.fullTimeEmployees,
+      employees_parttime: data.partTimeStaff,
+      last_year_revenue: data.lastYearRevenue,
+      paying_customers: data.payingCustomers,
+      pilot_customers: data.pilotPrograms,
     };
+
 
     emailjs
       .send(
@@ -158,10 +190,10 @@ export default function FormPage() {
         "Xc8OdGbltUPViTZkq" // Replace with EmailJS Public Key
       )
       .then(() => {
-        alert("Email sent successfully to " + formData.email + " and owner!");
+        // alert("Email sent successfully to " + formData.email + " and owner!");
       })
-      .catch((error) => {
-        alert("Failed to send email: " + error.text);
+      .catch(() => {
+        // alert("Failed to send email: " + error.text);
       });
 
 
@@ -236,42 +268,52 @@ export default function FormPage() {
   }
 
 
+  const router = useRouter();
+
 
   if (isSubmitted) {
     return (
       <>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50 p-4">
-          <Card className="w-full max-w-3xl shadow-lg border-0 overflow-hidden bg-white transition-all duration-500 animate-fade-in">
-            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-8">
-              <CardTitle className="text-3xl font-bold">Submission Received</CardTitle>
-              <CardDescription className="text-blue-100 text-lg mt-2">
-                Thank you for your application. We will review it shortly and get back to you if there is a potential fit.
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 px-6 py-10">
+          <Card className="w-full max-w-3xl shadow-2xl border border-gray-300 rounded-3xl bg-white transition-transform transform hover:scale-105 duration-500 animate-fade-in">
+
+            {/* Card Header */}
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-12 py-10 rounded-t-3xl">
+              <CardTitle className="text-4xl font-bold tracking-wide text-center">Submission Received</CardTitle>
+              <CardDescription className="text-white text-lg mt-3 text-center leading-relaxed">
+                Thank you for your application! We will review it soon and reach out if there&apos;s a potential fit.
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-8">
-              <div className="text-center space-y-4">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+             {/* Card Content */}
+             <CardContent className="px-12 py-12">
+              <div className="text-center space-y-8 p-8">
+
+                {/* Success Icon */}
+                <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto shadow-lg">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-10 w-10 text-green-600"
+                    className="h-14 w-14 text-green-600"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-800">Application Submitted Successfully</h3>
-                <p className="text-gray-600 max-w-md mx-auto">
+                {/* Success Message */}
+                <h3 className="text-2xl font-semibold text-gray-800 leading-snug">
+                  Application Submitted Successfully
+                </h3>
+                <p className="text-gray-600 max-w-lg mx-auto leading-relaxed text-lg">
                   We&apos;ve received your submission and will review it shortly. We review applications monthly and
                   will be in touch if there&apos;s a potential fit.
                 </p>
               </div>
             </CardContent>
-            <CardFooter className="bg-gray-50 p-6 flex justify-center">
+            <CardFooter className="bg-gray-100 px-12 py-8 flex justify-center rounded-b-3xl">
               <Button
-                onClick={() => setIsSubmitted(false)}
-                className="bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                onClick={() => { setIsSubmitted(false); router.push('/') }}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-lg px-8 py-4 mt-8 rounded-lg shadow-lg transition-all transform hover:-translate-y-1"
               >
                 Submit Another Application
               </Button>
@@ -782,27 +824,21 @@ export default function FormPage() {
                       <Label htmlFor="isRaisingCapital" className="text-sm font-medium">
                         Are you currently raising capital? *
                       </Label>
-                      <RadioGroup
-                        onValueChange={(value) => setValue("isRaisingCapital", value)}
-                        className="flex space-x-4 mt-1"
-                        name="isRaisingCapital"
-                      >
                         <div className="flex items-center space-x-2">
-                          <input type="radio" value="yes" id="raising-yes" name="isRaisingCapital"/>
+                          <input type="radio" value="yes" id="raising-yes" onClick={()=>setIsRaising(true)} name="isRaisingCapital"/>
                           <Label htmlFor="raising-yes" className="font-normal">
                             Yes
                           </Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <input type="radio" value="no" id="raising-no" name="isRaisingCapital"/>
+                          <input type="radio" value="no" id="raising-no" onClick={()=>setIsRaising(false)} name="isRaisingCapital"/>
                           <Label htmlFor="raising-no" className="font-normal">
                             No
                           </Label>
                         </div>
-                      </RadioGroup>
                     </div>
 
-                    {isRaisingCapital === "yes" && (
+                    {isRaising && (
                       <>
                         <div className="space-y-1">
                           <Label htmlFor="raiseAmount" className="text-sm font-medium">

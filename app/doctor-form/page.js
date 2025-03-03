@@ -743,7 +743,7 @@ export default function DoctorRegistrationForm() {
                         {categories.map((category) => (
                           <div
                             key={category.id}
-                            onClick={() => setFormData((prev) => ({ ...prev, category: category.id.toString() }))}
+                            onClick={() => setFormData((prev) => ({ ...prev, category: category.title.toString() }))}
                             className={`relative rounded-xl overflow-hidden cursor-pointer transition-all duration-300 transform hover:-translate-y-1 ${
                               formData.category === category.id.toString()
                                 ? "ring-2 ring-offset-2 ring-indigo-500 scale-[1.02]"
@@ -788,7 +788,7 @@ export default function DoctorRegistrationForm() {
                                   <span className="text-xs text-white">{category.rating}</span>
                                 </div>
                               </div>
-                              {formData.category === category.id.toString() && (
+                              {formData.category === category.title.toString() && (
                                 <div className="absolute top-3 right-3 bg-white rounded-full p-1">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
