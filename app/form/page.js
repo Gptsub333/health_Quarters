@@ -5,8 +5,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { format } from "date-fns"
 import { CalendarIcon, Upload } from "lucide-react"
-import Input from "@/components/ui/input";
-
+import Input from "@/components/ui/input"
 
 // Utility function
 const cn = (...classes) => {
@@ -31,17 +30,6 @@ const Button = ({ className, variant = "default", children, ...props }) => {
 }
 
 
-const Textarea = ({ className, ...props }) => {
-  return (
-    <textarea
-      className={cn(
-        "flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-        className,
-      )}
-      {...props}
-    />
-  )
-}
 
 const Label = ({ className, ...props }) => {
   return (
@@ -192,56 +180,56 @@ const PopoverContent = ({ children, className, open }) => {
 }
 
 const Calendar = ({ selected, onSelect }) => {
-  const [currentMonth, setCurrentMonth] = useState(selected || new Date());
+  const [currentMonth, setCurrentMonth] = useState(selected || new Date())
 
   // Get days in a specific month
-  const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
-  
+  const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate()
+
   // Get the first day of the month (for correct positioning in the calendar)
-  const firstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+  const firstDayOfMonth = (year, month) => new Date(year, month, 1).getDay()
 
   // Get the current year and month
-  const year = currentMonth.getFullYear();
-  const month = currentMonth.getMonth();
+  const year = currentMonth.getFullYear()
+  const month = currentMonth.getMonth()
 
   // Array to hold all the days for the current month
-  const days = [];
-  const daysCount = daysInMonth(year, month);
-  const firstDay = firstDayOfMonth(year, month);
+  const days = []
+  const daysCount = daysInMonth(year, month)
+  const firstDay = firstDayOfMonth(year, month)
 
   // Fill the array with empty slots for days before the 1st of the month
   for (let i = 0; i < firstDay; i++) {
-    days.push(null);
+    days.push(null)
   }
 
   // Push the days for the current month
   for (let i = 1; i <= daysCount; i++) {
-    days.push(new Date(year, month, i));
+    days.push(new Date(year, month, i))
   }
 
   // Handle going to the previous month
   const handlePrevMonth = () => {
-    setCurrentMonth(new Date(year, month - 1, 1));
-  };
+    setCurrentMonth(new Date(year, month - 1, 1))
+  }
 
   // Handle going to the next month
   const handleNextMonth = () => {
-    setCurrentMonth(new Date(year, month + 1, 1));
-  };
+    setCurrentMonth(new Date(year, month + 1, 1))
+  }
 
   // Handle changing the year
   const handleYearChange = (e) => {
-    const newYear = e.target.value;
+    const newYear = e.target.value
     if (newYear && !isNaN(newYear)) {
-      setCurrentMonth(new Date(newYear, month, 1));
+      setCurrentMonth(new Date(newYear, month, 1))
     }
-  };
+  }
 
   // Check if a date is selected
   const isSelected = (date) => {
-    if (!selected || !date) return false;
-    return date.toDateString() === selected.toDateString();
-  };
+    if (!selected || !date) return false
+    return date.toDateString() === selected.toDateString()
+  }
 
   return (
     <div className="p-3">
@@ -314,7 +302,7 @@ const Calendar = ({ selected, onSelect }) => {
                 onClick={() => onSelect(date)}
                 className={cn(
                   "h-8 w-8 rounded-md p-0 text-center text-sm",
-                  isSelected(date) ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+                  isSelected(date) ? "bg-primary text-primary-foreground" : "hover:bg-accent",
                 )}
               >
                 {date.getDate()}
@@ -326,8 +314,8 @@ const Calendar = ({ selected, onSelect }) => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
 const RadioGroup = ({ children, onValueChange, className }) => {
   const [value, setValue] = useState("")
@@ -372,6 +360,7 @@ export default function FormPage() {
     formState: { errors, isSubmitting },
     setValue,
     watch,
+    trigger,
   } = useForm()
 
   const [inceptionDate, setInceptionDate] = useState(null)
@@ -386,78 +375,81 @@ export default function FormPage() {
   const sector = watch("sector")
   const financialInstrument = watch("financialInstrument")
   const isRaisingCapital = watch("isRaisingCapital")
-  const [isOpen, setIsOpen] = useState(false); // State to control popover visibility
+  const [isOpen, setIsOpen] = useState(false) // State to control popover visibility
 
-  
   const steps = [
     { number: 1, label: "Basic Info" },
     { number: 2, label: "Company Details" },
     { number: 3, label: "Financials" },
-    { number: 4, label: "Documents" }
-  ];
+    { number: 4, label: "Documents" },
+  ]
 
-  const onSubmit = async (data) => {
-    // Prevent default form behavior
-    event.preventDefault();
-  
-    // Format dates
-    const formattedInceptionDate = inceptionDate ? format(inceptionDate, "yyyy-MM-dd") : "";
-  
-    // Create form data object
-    const formData = {
-      FirstName: data.founderFirstName,
-      LastName: data.founderLastName,
-      Email: data.email,
-      CompanyName: data.companyName,
-      Website: data.companyWebsite,
-      HearAboutUs: data.referralSource || data.otherReferralSource || "",
-      Description: data.companyDescription,
-      Problem: data.problemSolved,
-      Solution: data.solution,
-      BusinessModel: data.businessModel || data.otherBusinessModel || "",
-      InceptionDate: formattedInceptionDate,
-      CurrentStage: data.referralSource,
-      Industry: data.industry,
-      Sector: data.sector || data.otherSector || "",
-      City: data.city,
-      State: data.stateProvince,
-      ZipCode: data.postalCode,
-      Country: data.country,
-      FinancialInstrument: data.financialInstrument || data.otherFinancialInstrument || "",
-      RaisingCapital: data.isRaisingCapital,
-      CapitalRaised: data.totalCapitalRaised,
-      Employees: data.fullTimeEmployees,
-      ParttimeEmployees: data.partTimeStaff,
-      LastYearRevenue: data.lastYearRevenue,
-      Customers: data.payingCustomers,
-      PilotCustomers: data.pilotPrograms,
-      Logo: logoFile ? logoFile.name : "",
-      PitchDeck: deckFile ? deckFile.name : "",
-      PitchDeckLink: data.deckLink,
-      PitchVideoLink: data.pitchVideo
-    };
-    
-    try {
-      const response = await fetch("http://localhost:8000/upload_to_sheet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-  
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log("Success:", responseData);
-        setIsSubmitted(true);
-      } else {
-        console.error("Error submitting form");
-      }
-    } catch (error) {
-      console.error("Error:", error);
+  const onSubmit = async (data, event) => {
+    event.preventDefault() // Prevent the default form submission behavior
+
+    // Prepare the form data
+    const formData = new FormData()
+    formData.append("FirstName", data.founderFirstName)
+    formData.append("LastName", data.founderLastName)
+    formData.append("Email", data.email)
+    formData.append("CompanyName", data.companyName)
+    formData.append("Website", data.companyWebsite)
+    formData.append("HearAboutUs", data.referralSource || data.otherReferralSource || "")
+    formData.append("Description", data.companyDescription)
+    formData.append("Problem", data.problemSolved)
+    formData.append("Solution", data.solution)
+    formData.append("BusinessModel", data.businessModel || data.otherBusinessModel || "")
+    formData.append("InceptionDate", inceptionDate ? format(inceptionDate, "yyyy-MM-dd") : "")
+    formData.append("CurrentStage", data.referralSource)
+    formData.append("Industry", data.industry)
+    formData.append("Sector", data.sector || data.otherSector || "")
+    formData.append("City", data.city)
+    formData.append("State", data.stateProvince)
+    formData.append("ZipCode", data.postalCode)
+    formData.append("Country", data.country)
+    formData.append("FinancialInstrument", data.financialInstrument || data.otherFinancialInstrument || "")
+    formData.append("RaisingCapital", data.isRaisingCapital)
+    formData.append("CapitalRaised", data.totalCapitalRaised)
+    formData.append("Employees", data.fullTimeEmployees)
+    formData.append("ParttimeEmployees", data.partTimeStaff)
+    formData.append("LastYearRevenue", data.lastYearRevenue)
+    formData.append("Customers", data.payingCustomers)
+    formData.append("PilotCustomers", data.pilotPrograms)
+
+    // Append files if they exist
+    if (logoFile) {
+      formData.append("Logo", logoFile) // This is where the file is added
     }
 
-    setIsSubmitted(true)
-  };
-  
+    if (deckFile) {
+      formData.append("PitchDeck", deckFile) // This is where the file is added
+    }
+
+    // Optionally append other fields like links
+    formData.append("PitchDeckLink", data.deckLink)
+    formData.append("PitchVideoLink", data.pitchVideo)
+
+    // Log form data for debugging
+    console.log("Form Data:", Object.fromEntries(formData.entries()))
+
+    try {
+      // Send the form data (including files) to the backend
+      const response = await fetch("http://localhost:8000/upload_to_startups", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (response.ok) {
+        const responseData = await response.json()
+        console.log("Success:", responseData)
+        setIsSubmitted(true) // Form submitted successfully
+      } else {
+        console.error("Error submitting form")
+      }
+    } catch (error) {
+      console.error("Error:", error)
+    }
+  }
 
   const handleFileChange = (e, type) => {
     if (e.target.files && e.target.files[0]) {
@@ -469,9 +461,57 @@ export default function FormPage() {
     }
   }
 
-  const nextStep = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, 4))
-    window.scrollTo(0, 0)
+  // Validation based on the current step
+  const validateStep = async (step) => {
+    let isValid = true
+    const fields = {
+      1: ["founderFirstName", "founderLastName", "email", "companyName", "companyWebsite", "referralSource"],
+      2: ["companyDescription", "problemSolved", "solution", "country"],
+      3: [
+        "totalCapitalRaised",
+        "fullTimeEmployees",
+        "partTimeStaff",
+        "lastYearRevenue",
+        "payingCustomers",
+        "pilotPrograms",
+      ],
+      4: [],
+    }
+
+    if (step === 1 && referralSource === "other") {
+      fields[1].push("otherReferralSource")
+    }
+
+    if (step === 2 && sector === "other") {
+      fields[2].push("otherSector")
+    }
+
+    if (step === 2 && businessModel === "other") {
+      fields[2].push("otherBusinessModel")
+    }
+
+    if (step === 3 && financialInstrument === "other") {
+      fields[3].push("otherFinancialInstrument")
+    }
+
+    // Trigger validation for all fields in the current step
+    const stepValid = await trigger(fields[step])
+    if (!stepValid) {
+      isValid = false
+    }
+
+    return isValid
+  }
+
+  const nextStep = async () => {
+    // First validate the current step
+    const isValid = await validateStep(currentStep)
+    if (isValid) {
+      setCurrentStep((prev) => Math.min(prev + 1, 4))
+      window.scrollTo(0, 0)
+    } else {
+      console.log("Please fill in all required fields for this step")
+    }
   }
 
   const prevStep = () => {
@@ -535,7 +575,7 @@ export default function FormPage() {
             <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-8">
               <CardTitle className="text-3xl font-bold">Submission Received</CardTitle>
               <CardDescription className="text-blue-100 text-lg mt-2">
-                Thank you for your application to Ecliptic Capital
+                Thank you for your application. We will review it shortly and get back to you if there is a potential fit.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-8">
@@ -553,8 +593,8 @@ export default function FormPage() {
                 </div>
                 <h3 className="text-2xl font-semibold text-gray-800">Application Submitted Successfully</h3>
                 <p className="text-gray-600 max-w-md mx-auto">
-                  We&apos;ve received your submission and will review it shortly. We review applications monthly and will be
-                  in touch if there&apos;s a potential fit.
+                  We&apos;ve received your submission and will review it shortly. We review applications monthly and
+                  will be in touch if there&apos;s a potential fit.
                 </p>
               </div>
             </CardContent>
@@ -581,9 +621,7 @@ export default function FormPage() {
         <div className="max-w-4xl mx-auto">
           <Card className="border-0 shadow-lg overflow-hidden bg-white transition-all duration-500">
             <CardHeader className="bg-gradient-to-r from-blue-700 to-indigo-900 text-white p-6 md:p-8">
-              <CardTitle className="text-2xl md:text-3xl font-bold">
-                Submissions Form
-              </CardTitle>
+              <CardTitle className="text-2xl md:text-3xl font-bold">Submissions Form</CardTitle>
               <CardDescription className="text-white mt-2 text-base md:text-lg">
                 For early-stage Startups who want to explore the power of AI in the healthcare field.
               </CardDescription>
@@ -597,56 +635,58 @@ export default function FormPage() {
                     <button
                       onClick={() => setCurrentStep(step.number)}
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-2 relative z-10 transition-all duration-300 ${
-                        currentStep > step.number 
+                        currentStep > step.number
                           ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white shadow-md"
                           : currentStep === step.number
-                          ? "bg-white text-blue-600 border-2 border-blue-500 shadow-md"
-                          : "bg-white text-gray-400 border-2 border-gray-200"
+                            ? "bg-white text-blue-600 border-2 border-blue-500 shadow-md"
+                            : "bg-white text-gray-400 border-2 border-gray-200"
                       }`}
                     >
                       {currentStep > step.number ? (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       ) : (
                         step.number
                       )}
                     </button>
-                    
-                    
+
                     {/* Step Label */}
-                    <span className={`text-xs font-medium mt-1 text-center transition-colors duration-300 ${
-                      currentStep >= step.number ? "text-blue-600" : "text-gray-500"
-                    } hidden sm:block`}>
+                    <span
+                      className={`text-xs font-medium mt-1 text-center transition-colors duration-300 ${
+                        currentStep >= step.number ? "text-blue-600" : "text-gray-500"
+                      } hidden sm:block`}
+                    >
                       {step.label}
                     </span>
                   </div>
                 ))}
               </div>
-              
+
               {/* Mobile Labels (only shown on very small screens) */}
               <div className="sm:hidden text-center mt-4">
                 <span className="text-sm font-medium text-blue-600">
-                  {steps.find(step => step.number === currentStep)?.label}
+                  {steps.find((step) => step.number === currentStep)?.label}
                 </span>
               </div>
             </div>
 
-
             <form onSubmit={handleSubmit(onSubmit)}>
               <CardContent className="p-6 md:p-8 space-y-8 overflow-auto">
-                
-
                 {currentStep === 1 && (
                   <div className="space-y-6 animate-fade-in">
-
                     <div className="text-sm text-gray-500 italic border-l-4 border-blue-200 pl-4 py-2 bg-blue-50 rounded-r-md">
-                      This form will take roughly 10 minutes to complete. We review applications monthly. We will not share
-                      your personal information without permission, except when required by law.
+                      This form will take roughly 10 minutes to complete. We review applications monthly. We will not
+                      share your personal information without permission, except when required by law.
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                       <div className="space-y-1">
                         <Label htmlFor="founderFirstName" className="text-sm font-medium">
                           Founder First Name *
@@ -686,7 +726,13 @@ export default function FormPage() {
                           type="email"
                           placeholder="your@email.com"
                           className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                          {...register("email", { required: "Email is required" })}
+                          {...register("email", {
+                            required: "Email is required",
+                            pattern: {
+                              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                              message: "Invalid email address",
+                            },
+                          })}
                         />
                         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                       </div>
@@ -715,7 +761,13 @@ export default function FormPage() {
                         id="companyWebsite"
                         placeholder="https://www.example.com"
                         className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                        {...register("companyWebsite", { required: "Company website is required" })}
+                        {...register("companyWebsite", {
+                          required: "Company website is required",
+                          pattern: {
+                            value: /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})?/,
+                            message: "Please enter a valid website URL",
+                          },
+                        })}
                       />
                       {errors.companyWebsite && (
                         <p className="text-red-500 text-xs mt-1">{errors.companyWebsite.message}</p>
@@ -733,6 +785,9 @@ export default function FormPage() {
                         <SelectItem value="event">Event</SelectItem>
                         <SelectItem value="other">Other</SelectItem>
                       </Select>
+                      {errors.referralSource && (
+                        <p className="text-red-500 text-xs mt-1">{errors.referralSource.message}</p>
+                      )}
                     </div>
 
                     {referralSource === "other" && (
@@ -744,8 +799,13 @@ export default function FormPage() {
                           id="otherReferralSource"
                           placeholder="Please specify"
                           className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                          {...register("otherReferralSource")}
+                          {...register("otherReferralSource", {
+                            required: referralSource === "other" ? "Please specify how you heard about us" : false,
+                          })}
                         />
+                        {errors.otherReferralSource && (
+                          <p className="text-red-500 text-xs mt-1">{errors.otherReferralSource.message}</p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -757,7 +817,7 @@ export default function FormPage() {
                       <Label htmlFor="companyDescription" className="text-sm font-medium">
                         Please provide a short description of your company. *
                       </Label>
-                      <Textarea
+                      <Input
                         id="companyDescription"
                         placeholder="Describe your company in a few sentences"
                         className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 min-h-[100px]"
@@ -772,7 +832,7 @@ export default function FormPage() {
                       <Label htmlFor="problemSolved" className="text-sm font-medium">
                         In a few sentences, what is the problem your startup solves? *
                       </Label>
-                      <Textarea
+                      <Input
                         id="problemSolved"
                         placeholder="Describe the problem your startup addresses"
                         className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 min-h-[100px]"
@@ -787,7 +847,7 @@ export default function FormPage() {
                       <Label htmlFor="solution" className="text-sm font-medium">
                         In a few sentences, what is your solution? *
                       </Label>
-                      <Textarea
+                      <Input
                         id="solution"
                         placeholder="Describe your solution"
                         className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 min-h-[100px]"
@@ -820,112 +880,116 @@ export default function FormPage() {
                           id="otherBusinessModel"
                           placeholder="Please specify"
                           className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                          {...register("otherBusinessModel")}
+                          {...register("otherBusinessModel", {
+                            required: businessModel === "other" ? "Please specify your business model" : false,
+                          })}
                         />
+                        {errors.otherBusinessModel && (
+                          <p className="text-red-500 text-xs mt-1">{errors.otherBusinessModel.message}</p>
+                        )}
                       </div>
                     )}
 
                     <div className="w-full space-y-1">
-                                {/* Label */}
-                                <Label 
-                                    htmlFor="inceptionDate" 
-                                    className="text-sm font-medium tracking-wide text-gray-700 flex items-center"
-                                >
-                                    Company Inception Date
-                                    <span className="text-gray-400 ml-1 text-xs font-normal">(When was the company founded?)</span>
-                                </Label>
-                                
-                                {/* Calendar Popover */}
-                                <Popover open={isOpen} onOpenChange={setIsOpen}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => setIsOpen(!isOpen)}
-                                            className={`
+                      {/* Label */}
+                      <Label
+                        htmlFor="inceptionDate"
+                        className="text-sm font-medium tracking-wide text-gray-700 flex items-center"
+                      >
+                        Company Inception Date
+                        <span className="text-gray-400 ml-1 text-xs font-normal">(When was the company founded?)</span>
+                      </Label>
+
+                      {/* Calendar Popover */}
+                      <Popover open={isOpen} onOpenChange={setIsOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            onClick={() => setIsOpen(!isOpen)}
+                            className={`
                                                 w-full h-11 px-4 justify-between text-left rounded-md border border-gray-300
                                                 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all duration-200
                                                 hover:border-blue-400 hover:bg-blue-50/30
                                                 ${!inceptionDate ? "text-gray-500" : ""}
                                             `}
-                                        >
-                                            <div className="flex items-center">
-                                                <CalendarIcon className={`mr-2 h-5 w-5 ${inceptionDate ? "text-blue-600" : "text-gray-400"}`} />
-                                                <span className={inceptionDate ? "text-gray-800 font-medium" : "text-gray-500"}>
-                                                    {inceptionDate ? format(inceptionDate, "MMMM d, yyyy") : "Select founding date"}
-                                                </span>
-                                            </div>
-                                            {/* Dropdown Icon */}
-                                            <svg 
-                                                className="h-4 w-4 text-gray-400" 
-                                                xmlns="http://www.w3.org/2000/svg" 
-                                                viewBox="0 0 24 24" 
-                                                fill="none" 
-                                                stroke="currentColor" 
-                                                strokeWidth="2" 
-                                                strokeLinecap="round" 
-                                                strokeLinejoin="round"
-                                            >
-                                                <polyline points="6 9 12 15 18 9"></polyline>
-                                            </svg>
-                                        </Button>
-                                    </PopoverTrigger>
-
-                                    {/* Popover Content with Calendar */}
-                                    <PopoverContent className="p-0 border border-gray-200 rounded-lg shadow-lg w-auto">
-                                        <Calendar
-                                            mode="single"
-                                            selected={inceptionDate}
-                                            onSelect={(date) => {
-                                                setInceptionDate(date);
-                                                setIsOpen(false); // ✅ Close the calendar after selection
-                                            }}
-                                            initialFocus
-                                            className="rounded-md"
-                                            classNames={{
-                                                day_selected: "bg-blue-600 text-white hover:bg-blue-700 focus:bg-blue-700",
-                                                day_today: "bg-gray-100 text-gray-900",
-                                                day_outside: "text-gray-300 opacity-50",
-                                            }}
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-
-                                {/* Helper Text */}
-                                <p className="text-xs text-gray-500 mt-1">
-                                    This helps us understand your company&apos;s history and experience.
-                                </p>
+                          >
+                            <div className="flex items-center">
+                              <CalendarIcon
+                                className={`mr-2 h-5 w-5 ${inceptionDate ? "text-blue-600" : "text-gray-400"}`}
+                              />
+                              <span className={inceptionDate ? "text-gray-800 font-medium" : "text-gray-500"}>
+                                {inceptionDate ? format(inceptionDate, "MMMM d, yyyy") : "Select founding date"}
+                              </span>
                             </div>
+                            {/* Dropdown Icon */}
+                            <svg
+                              className="h-4 w-4 text-gray-400"
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                          </Button>
+                        </PopoverTrigger>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-1">
-                          <Label htmlFor="referralSource" className="text-sm font-medium">
-                            What stage is your business? *
-                          </Label>
-                          <Select onValueChange={(value) => setValue("referralSource", value)} defaultValue="">
-                            <SelectItem value="idea">Idea Stage</SelectItem>
-                                <SelectItem value="pre_seed">Pre-Seed</SelectItem>
-                                <SelectItem value="seed">Seed</SelectItem>
-                                <SelectItem value="series_a">Series A</SelectItem>
-                                <SelectItem value="series_b">Series B</SelectItem>
-                                <SelectItem value="growth">Growth</SelectItem>
-                          </Select>
-                        </div>
+                        {/* Popover Content with Calendar */}
+                        <PopoverContent className="p-0 border border-gray-200 rounded-lg shadow-lg w-auto">
+                          <Calendar
+                            mode="single"
+                            selected={inceptionDate}
+                            onSelect={(date) => {
+                              setInceptionDate(date)
+                              setIsOpen(false) // ✅ Close the calendar after selection
+                            }}
+                            initialFocus
+                            className="rounded-md"
+                            classNames={{
+                              day_selected: "bg-blue-600 text-white hover:bg-blue-700 focus:bg-blue-700",
+                              day_today: "bg-gray-100 text-gray-900",
+                              day_outside: "text-gray-300 opacity-50",
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
 
-
-                        <div className="space-y-1">
-                      <Label htmlFor="referralSource" className="text-sm font-medium">
-                        What industry is your company? *
-                      </Label>
-                      <Select onValueChange={(value) => setValue("industry", value)} defaultValue="">
-			                      <SelectItem value="life_sciences">Life Sciences</SelectItem>
-                            <SelectItem value="energy_transition">Energy Transition</SelectItem>
-                            <SelectItem value="identity_security">Identity & Security</SelectItem>
-                            <SelectItem value="climate_tech">Climate Tech</SelectItem>
-                            <SelectItem value="material_sciences">Material Sciences</SelectItem>
-
-                      </Select>
+                      {/* Helper Text */}
+                      <p className="text-xs text-gray-500 mt-1">
+                        This helps us understand your company&apos;s history and experience.
+                      </p>
                     </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-1">
+                        <Label htmlFor="referralSource" className="text-sm font-medium">
+                          What stage is your business? *
+                        </Label>
+                        <Select onValueChange={(value) => setValue("referralSource", value)} defaultValue="">
+                          <SelectItem value="idea">Idea Stage</SelectItem>
+                          <SelectItem value="pre_seed">Pre-Seed</SelectItem>
+                          <SelectItem value="seed">Seed</SelectItem>
+                          <SelectItem value="series_a">Series A</SelectItem>
+                          <SelectItem value="series_b">Series B</SelectItem>
+                          <SelectItem value="growth">Growth</SelectItem>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label htmlFor="referralSource" className="text-sm font-medium">
+                          What industry is your company? *
+                        </Label>
+                        <Select onValueChange={(value) => setValue("industry", value)} defaultValue="">
+                          <SelectItem value="life_sciences">Life Sciences</SelectItem>
+                          <SelectItem value="energy_transition">Energy Transition</SelectItem>
+                          <SelectItem value="identity_security">Identity & Security</SelectItem>
+                          <SelectItem value="climate_tech">Climate Tech</SelectItem>
+                          <SelectItem value="material_sciences">Material Sciences</SelectItem>
+                        </Select>
+                      </div>
                     </div>
 
                     <div className="space-y-1">
@@ -933,17 +997,14 @@ export default function FormPage() {
                         What sector(s) is your company? *
                       </Label>
                       <Select onValueChange={(value) => setValue("sector", value)} defaultValue="">
-			                    <SelectItem value="biotech">Biotech</SelectItem>
-                          <SelectItem value="medtech">MedTech</SelectItem>
-                          <SelectItem value="cleantech">CleanTech</SelectItem>
-                          <SelectItem value="cybersecurity">Cybersecurity</SelectItem>
-                          <SelectItem value="ai_ml">AI/ML</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-
-
+                        <SelectItem value="biotech">Biotech</SelectItem>
+                        <SelectItem value="medtech">MedTech</SelectItem>
+                        <SelectItem value="cleantech">CleanTech</SelectItem>
+                        <SelectItem value="cybersecurity">Cybersecurity</SelectItem>
+                        <SelectItem value="ai_ml">AI/ML</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
                       </Select>
                     </div>
-
 
                     {sector === "other" && (
                       <div className="space-y-1">
@@ -954,8 +1015,13 @@ export default function FormPage() {
                           id="otherSector"
                           placeholder="Please specify"
                           className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                          {...register("otherSector")}
+                          {...register("otherSector", {
+                            required: sector === "other" ? "Please specify your sector" : false,
+                          })}
                         />
+                        {errors.otherSector && (
+                          <p className="text-red-500 text-xs mt-1">{errors.otherSector.message}</p>
+                        )}
                       </div>
                     )}
 
@@ -1022,12 +1088,11 @@ export default function FormPage() {
                         What is your financial instrument?
                       </Label>
                       <Select onValueChange={(value) => setValue("financialInstrument", value)} defaultValue="">
-                      
-                          <SelectItem value="equity">Equity</SelectItem>
-                          <SelectItem value="convertible_note">Convertible Note</SelectItem>
-                          <SelectItem value="safe">SAFE</SelectItem>
-                          <SelectItem value="debt">Debt</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                        <SelectItem value="equity">Equity</SelectItem>
+                        <SelectItem value="convertible_note">Convertible Note</SelectItem>
+                        <SelectItem value="safe">SAFE</SelectItem>
+                        <SelectItem value="debt">Debt</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
                       </Select>
                     </div>
 
@@ -1040,8 +1105,14 @@ export default function FormPage() {
                           id="otherFinancialInstrument"
                           placeholder="Please specify"
                           className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                          {...register("otherFinancialInstrument")}
+                          {...register("otherFinancialInstrument", {
+                            required:
+                              financialInstrument === "other" ? "Please specify your financial instrument" : false,
+                          })}
                         />
+                        {errors.otherFinancialInstrument && (
+                          <p className="text-red-500 text-xs mt-1">{errors.otherFinancialInstrument.message}</p>
+                        )}
                       </div>
                     )}
 
@@ -1324,24 +1395,31 @@ export default function FormPage() {
               </CardContent>
 
               <CardFooter className="mt-6 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 p-6 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200 rounded-b-lg">
-              <div className="w-full sm:w-auto order-2 sm:order-1">
+                <div className="w-full sm:w-auto order-2 sm:order-1">
                   {currentStep > 1 && (
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={prevStep} 
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={prevStep}
                       className="w-full sm:w-auto px-6 py-2 border-gray-300 hover:bg-gray-100 hover:border-gray-400 text-gray-700 font-medium transition-all duration-200 flex items-center justify-center gap-2 rounded-md"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       Previous
                     </Button>
                   )}
                 </div>
-                
-                
-                
+
                 <div className="w-full sm:w-auto order-3">
                   {currentStep < 4 ? (
                     <Button
@@ -1350,8 +1428,17 @@ export default function FormPage() {
                       className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium transition-all duration-200 rounded-md shadow-sm hover:shadow flex items-center justify-center gap-2"
                     >
                       Next
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </Button>
                   ) : (
@@ -1387,8 +1474,17 @@ export default function FormPage() {
                       ) : (
                         <>
                           Submit Application
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
                           </svg>
                         </>
                       )}

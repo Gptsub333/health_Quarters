@@ -39,6 +39,7 @@ export default function DoctorRegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [focusedField, setFocusedField] = useState("")
   const router = useRouter() // ✅ Initialize router
+  const [errors, setErrors] = useState({})
 
   const handleInputFocus = (fieldName) => {
     setFocusedField(fieldName)
@@ -46,6 +47,40 @@ export default function DoctorRegistrationForm() {
 
   const handleInputBlur = () => {
     setFocusedField("")
+  }
+
+  const validateField = (name, value) => {
+    let error = ""
+
+    switch (name) {
+      case "email":
+        if (value && !/\S+@\S+\.\S+/.test(value)) {
+          error = "Please enter a valid email address"
+        }
+        break
+      case "phone":
+        if (value && !/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/.test(value)) {
+          error = "Please enter a valid phone number"
+        }
+        break
+      case "experience":
+        if (value && (isNaN(value) || Number.parseInt(value) < 0)) {
+          error = "Experience must be a positive number"
+        }
+        break
+      case "hourlyRate":
+        if (value && (isNaN(value) || Number.parseFloat(value) <= 0)) {
+          error = "Hourly rate must be greater than zero"
+        }
+        break
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }))
+
+    return !error
   }
 
   const handleInputChange = (e) => {
@@ -67,102 +102,195 @@ export default function DoctorRegistrationForm() {
         ...prev,
         [name]: value,
       }))
+
+      // Validate the field
+      validateField(name, value)
     }
   }
 
-    
-
-
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
+    e.preventDefault() // Prevent the default form submission behavior
+    console.log("Form submission started")
+
+    // Basic validation
+    const requiredFields = {
+      title: "Title",
+      firstName: "First Name",
+      email: "Email",
+      phone: "Phone",
+      specialization: "Specialization",
+      experience: "Years of Experience",
+      license: "Medical License Number",
+      hourlyRate: "Hourly Rate",
+      category: "Expertise Category",
+      image: "Profile Photo",
+      documents: "Medical License Document",
+      terms: "Terms and Conditions",
+    }
+
+    // Check if any required fields are empty
+    const missingFields = []
+    Object.entries(requiredFields).forEach(([field, label]) => {
+      if (field === "terms" && !formData[field]) {
+        missingFields.push(label)
+      } else if (field !== "terms" && (!formData[field] || formData[field] === "")) {
+        missingFields.push(label)
+      }
+    })
+
+    // Check if at least one day is selected
+    const hasSelectedDay = Object.values(formData.availableDays).some((day) => day)
+    if (!hasSelectedDay) {
+      missingFields.push("Available Days (at least one)")
+    }
+
+    // Show alert if any required fields are missing
+    if (missingFields.length > 0) {
+      console.log("Missing required fields:", missingFields)
+      alert(`Please fill in the following required fields: ${missingFields.join(", ")}`)
+      return
+    }
+
+    setIsSubmitting(true)
+    console.log("Validation passed, preparing form data")
+
     // Prepare the form data
-    const doctorData = {
-      Title: formData.title,
-      FirstName: formData.firstName,
-      LastName: formData.lastName,
-      Email: formData.email,
-      Phone: formData.phone,
-      Specialization: formData.specialization,
-      Experience: formData.experience,
-      LicenseNumber: formData.license,
-      Hospital: formData.hospital,
-      City: formData.city,
-      Country: formData.country,
-      Bio: formData.bio,
-      HourlyRate: formData.hourlyRate,
-      AvailableDays: Object.keys(formData.availableDays)
-        .filter(day => formData.availableDays[day])
-        .join(','),
-      Designation: formData.designation,
-      Category: formData.category,
-      TermsAccepted: formData.terms
-    };
+    const fileData = new FormData()
     
-    // Create FormData object for file uploads
-    const fileData = new FormData();
+    // Append all text fields to FormData
+    fileData.append("Title", formData.title)
+    fileData.append("FirstName", formData.firstName)
+    fileData.append("LastName", formData.lastName || "")
+    fileData.append("Email", formData.email)
+    fileData.append("Phone", formData.phone)
+    fileData.append("Specialization", formData.specialization)
+    fileData.append("Experience", formData.experience)
+    fileData.append("LicenseNumber", formData.license)
+    fileData.append("Hospital", formData.hospital || "")
+    fileData.append("City", formData.city || "")
+    fileData.append("Country", formData.country || "")
+    fileData.append("Bio", formData.bio || "")
+    fileData.append("HourlyRate", formData.hourlyRate)
+    fileData.append("Designation", formData.designation)
+    fileData.append("Category", formData.category)
+    fileData.append("TermsAccepted", formData.terms)
     
-    // Append all the text data
-    Object.keys(doctorData).forEach(key => {
-      fileData.append(key, doctorData[key]);
-    });
-    
+    // Append available days as a comma-separated string
+    const availableDays = Object.keys(formData.availableDays)
+      .filter((day) => formData.availableDays[day])
+      .join(",")
+    fileData.append("AvailableDays", availableDays)
+
     // Append files if they exist
     if (formData.image) {
-      fileData.append('ProfileImage', formData.image);
+      fileData.append("ProfileImage", formData.image)
+      console.log("Profile image attached:", formData.image.name)
     }
-    
+
     if (formData.documents) {
-      fileData.append('LicenseDocument', formData.documents);
+      fileData.append("LicenseDocument", formData.documents)
+      console.log("License document attached:", formData.documents.name)
     }
-    router.push("/")
-    
+
+    // Log the form data being submitted
+    console.log("Form data being submitted:")
+    for (const [key, value] of fileData.entries()) {
+      // Don't log the full file objects, just their names
+      if (value instanceof File) {
+        console.log(`${key}: File - ${value.name}`)
+      } else {
+        console.log(`${key}: ${value}`)
+      }
+    }
+
     try {
-      // For JSON data (if not uploading files)
-      // const response = await fetch("YOUR_API_ENDPOINT", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(doctorData),
-      // });
-      
+      console.log("Submitting to API endpoint...")
       // For FormData (with file uploads)
-      const response = await fetch("YOUR_API_ENDPOINT", {
+      // Replace with your actual API endpoint
+      const response = await fetch("https://api.example.com/doctor-registration", {
         method: "POST",
         body: fileData,
         // Don't set Content-Type header when sending FormData
-      });
-      
+      })
+
       if (response.ok) {
-        const responseData = await response.json();
-        console.log("Registration successful:", responseData);
-        // Redirect to confirmation page or dashboard
-        router.push("/registration-success");
+        console.log("Registration successful!")
+        alert("Registration successful! Thank you for joining our medical expert community.")
+        // Redirect to success page or dashboard
+        router.push("/registration-success")
       } else {
-        console.error("Error submitting form");
-        // Handle error state
-        setIsSubmitting(false);
+        const errorData = await response.json().catch(() => null)
+        console.error("API error response:", errorData)
+        alert(`Error submitting form: ${errorData?.message || "Please try again later"}`)
+        setIsSubmitting(false)
       }
     } catch (error) {
-      console.error("Error:", error);
-      setIsSubmitting(false);
+      console.error("Submission error:", error)
+      alert("An error occurred while submitting the form. Please try again later.")
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const nextStep = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, 4))
+    let canProceed = true
+
+    // Validate fields based on current step
+    if (currentStep === 1) {
+      const step1Fields = ["title", "firstName", "email", "phone"]
+      step1Fields.forEach((field) => {
+        if (!validateField(field, formData[field])) {
+          canProceed = false
+        }
+      })
+
+      // Additional validation for required fields
+      if (!formData.title || !formData.firstName || !formData.email || !formData.phone) {
+        canProceed = false
+        alert("Please fill in all required fields before proceeding.")
+      }
+    } else if (currentStep === 2) {
+      const step2Fields = ["specialization", "experience", "hourlyRate", "license"]
+      step2Fields.forEach((field) => {
+        if (!validateField(field, formData[field])) {
+          canProceed = false
+        }
+      })
+
+      // Check if at least one day is selected
+      const hasSelectedDay = Object.values(formData.availableDays).some((day) => day)
+      if (!hasSelectedDay) {
+        canProceed = false
+        alert("Please select at least one available day.")
+      }
+
+      // Additional validation for required fields
+      if (!formData.specialization || !formData.experience || !formData.hourlyRate || !formData.license) {
+        canProceed = false
+        alert("Please fill in all required fields before proceeding.")
+      }
+    } else if (currentStep === 3) {
+      if (!formData.category) {
+        canProceed = false
+        alert("Please select an expertise category before proceeding.")
+      }
+    }
+
+    if (canProceed) {
+      setCurrentStep((prev) => Math.min(prev + 1, 4))
+    }
   }
 
   const prevStep = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1))
   }
 
-  const InputWrapper = ({ children, label, required = false }) => (
+  const InputWrapper = ({ children, label, required = false, name }) => (
     <div className="relative">
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       {children}
+      {errors[name] && <p className="mt-1 text-sm text-red-500">{errors[name]}</p>}
     </div>
   )
 
@@ -321,7 +449,7 @@ export default function DoctorRegistrationForm() {
                     className="space-y-6"
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <InputWrapper label="Title" required>
+                      <InputWrapper label="Title" required name="title">
                         <select
                           name="title"
                           value={formData.title}
@@ -329,7 +457,11 @@ export default function DoctorRegistrationForm() {
                           onFocus={() => handleInputFocus("title")}
                           onBlur={handleInputBlur}
                           className={`w-full px-4 py-2.5 rounded-lg border ${
-                            focusedField === "title" ? "border-indigo-500 ring-2 ring-indigo-200" : "border-gray-300"
+                            focusedField === "title"
+                              ? "border-indigo-500 ring-2 ring-indigo-200"
+                              : errors.title
+                                ? "border-red-500"
+                                : "border-gray-300"
                           } focus:outline-none transition-all duration-200`}
                           required
                         >
@@ -340,7 +472,7 @@ export default function DoctorRegistrationForm() {
                         </select>
                       </InputWrapper>
 
-                      <InputWrapper label="First Name" required>
+                      <InputWrapper label="First Name" required name="firstName">
                         <input
                           type="text"
                           name="firstName"
@@ -351,15 +483,19 @@ export default function DoctorRegistrationForm() {
                           className={`w-full px-4 py-2.5 rounded-lg border ${
                             focusedField === "firstName"
                               ? "border-indigo-500 ring-2 ring-indigo-200"
-                              : "border-gray-300"
+                              : errors.firstName
+                                ? "border-red-500"
+                                : "border-gray-300"
                           } focus:outline-none transition-all duration-200`}
                           required
                         />
+                        
+                      
                       </InputWrapper>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <InputWrapper label="Email" required>
+                      <InputWrapper label="Email" required name="email">
                         <input
                           type="email"
                           name="email"
@@ -368,13 +504,17 @@ export default function DoctorRegistrationForm() {
                           onFocus={() => handleInputFocus("email")}
                           onBlur={handleInputBlur}
                           className={`w-full px-4 py-2.5 rounded-lg border ${
-                            focusedField === "email" ? "border-indigo-500 ring-2 ring-indigo-200" : "border-gray-300"
+                            focusedField === "email"
+                              ? "border-indigo-500 ring-2 ring-indigo-200"
+                              : errors.email
+                                ? "border-red-500"
+                                : "border-gray-300"
                           } focus:outline-none transition-all duration-200`}
                           required
                         />
                       </InputWrapper>
 
-                      <InputWrapper label="Phone" required>
+                      <InputWrapper label="Phone" required name="phone">
                         <input
                           type="tel"
                           name="phone"
@@ -383,7 +523,11 @@ export default function DoctorRegistrationForm() {
                           onFocus={() => handleInputFocus("phone")}
                           onBlur={handleInputBlur}
                           className={`w-full px-4 py-2.5 rounded-lg border ${
-                            focusedField === "phone" ? "border-indigo-500 ring-2 ring-indigo-200" : "border-gray-300"
+                            focusedField === "phone"
+                              ? "border-indigo-500 ring-2 ring-indigo-200"
+                              : errors.phone
+                                ? "border-red-500"
+                                : "border-gray-300"
                           } focus:outline-none transition-all duration-200`}
                           required
                         />
@@ -401,7 +545,7 @@ export default function DoctorRegistrationForm() {
                     className="space-y-6"
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <InputWrapper label="Specialization" required>
+                      <InputWrapper label="Specialization" required name="specialization">
                         <select
                           name="specialization"
                           value={formData.specialization}
@@ -411,7 +555,9 @@ export default function DoctorRegistrationForm() {
                           className={`w-full px-4 py-2.5 rounded-lg border ${
                             focusedField === "specialization"
                               ? "border-indigo-500 ring-2 ring-indigo-200"
-                              : "border-gray-300"
+                              : errors.specialization
+                                ? "border-red-500"
+                                : "border-gray-300"
                           } focus:outline-none transition-all duration-200`}
                           required
                         >
@@ -423,7 +569,7 @@ export default function DoctorRegistrationForm() {
                         </select>
                       </InputWrapper>
 
-                      <InputWrapper label="Years of Experience" required>
+                      <InputWrapper label="Years of Experience" required name="experience">
                         <input
                           type="number"
                           name="experience"
@@ -434,7 +580,9 @@ export default function DoctorRegistrationForm() {
                           className={`w-full px-4 py-2.5 rounded-lg border ${
                             focusedField === "experience"
                               ? "border-indigo-500 ring-2 ring-indigo-200"
-                              : "border-gray-300"
+                              : errors.experience
+                                ? "border-red-500"
+                                : "border-gray-300"
                           } focus:outline-none transition-all duration-200`}
                           required
                           min="0"
@@ -443,7 +591,7 @@ export default function DoctorRegistrationForm() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <InputWrapper label="Hourly Rate ($)" required>
+                      <InputWrapper label="Hourly Rate ($)" required name="hourlyRate">
                         <input
                           type="number"
                           name="hourlyRate"
@@ -454,7 +602,9 @@ export default function DoctorRegistrationForm() {
                           className={`w-full px-4 py-2.5 rounded-lg border ${
                             focusedField === "hourlyRate"
                               ? "border-indigo-500 ring-2 ring-indigo-200"
-                              : "border-gray-300"
+                              : errors.hourlyRate
+                                ? "border-red-500"
+                                : "border-gray-300"
                           } focus:outline-none transition-all duration-200`}
                           required
                           min="0"
@@ -462,7 +612,7 @@ export default function DoctorRegistrationForm() {
                         />
                       </InputWrapper>
 
-                      <InputWrapper label="Designation" required>
+                      <InputWrapper label="Designation" required name="designation">
                         <input
                           type="text"
                           name="designation"
@@ -481,7 +631,7 @@ export default function DoctorRegistrationForm() {
                       </InputWrapper>
                     </div>
 
-                    <InputWrapper label="Medical License Number" required>
+                    <InputWrapper label="Medical License Number" required name="license">
                       <input
                         type="text"
                         name="license"
@@ -490,13 +640,17 @@ export default function DoctorRegistrationForm() {
                         onFocus={() => handleInputFocus("license")}
                         onBlur={handleInputBlur}
                         className={`w-full px-4 py-2.5 rounded-lg border ${
-                          focusedField === "license" ? "border-indigo-500 ring-2 ring-indigo-200" : "border-gray-300"
+                          focusedField === "license"
+                            ? "border-indigo-500 ring-2 ring-indigo-200"
+                            : errors.license
+                              ? "border-red-500"
+                              : "border-gray-300"
                         } focus:outline-none transition-all duration-200`}
                         required
                       />
                     </InputWrapper>
 
-                    <InputWrapper label="Current Hospital/Clinic">
+                    <InputWrapper label="Current Hospital/Clinic" name="hospital">
                       <input
                         type="text"
                         name="hospital"
@@ -539,7 +693,7 @@ export default function DoctorRegistrationForm() {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-6"
                   >
-                    <InputWrapper label="Select Your Expertise Category" required>
+                    <InputWrapper label="Select Your Expertise Category" required name="category">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                         {categories.map((category) => (
                           <div
@@ -621,7 +775,7 @@ export default function DoctorRegistrationForm() {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-6"
                   >
-                    <InputWrapper label="Profile Photo" required>
+                    <InputWrapper label="Profile Photo" required name="image">
                       <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg border-gray-300 hover:border-indigo-500 transition-colors duration-200">
                         <div className="space-y-1 text-center">
                           <svg
@@ -660,7 +814,7 @@ export default function DoctorRegistrationForm() {
                       </div>
                     </InputWrapper>
 
-                    <InputWrapper label="Medical License Document" required>
+                    <InputWrapper label="Medical License Document" required name="documents">
                       <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg border-gray-300 hover:border-indigo-500 transition-colors duration-200">
                         <div className="space-y-1 text-center">
                           <svg
@@ -671,7 +825,7 @@ export default function DoctorRegistrationForm() {
                             aria-hidden="true"
                           >
                             <path
-                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
                               strokeWidth={2}
                               strokeLinecap="round"
                               strokeLinejoin="round"
