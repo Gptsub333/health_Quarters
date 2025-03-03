@@ -1,6 +1,4 @@
-const cn = (...classes) => {
-  return classes.filter(Boolean).join(" ");
-};
+
 const SelectItem = ({ children, onSelect }) => {
   return (
     <div

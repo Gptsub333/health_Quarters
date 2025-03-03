@@ -74,11 +74,6 @@ export default function FormPage() {
     { number: 3, label: "Financials" },
     { number: 4, label: "Documents" },
   ]
-
-  const onSubmit = async ( event,data) => {
-    event.preventDefault() // Prevent the default form submission behavior
-    event.stopPropagation() // Prevent the event from bubbling up
-
     // Prepare the form data
   const onSubmit = async (data, event) => {
     console.log("data", data)

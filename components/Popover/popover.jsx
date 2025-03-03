@@ -1,5 +1,5 @@
 import React from "react";
-const { useState } = require("react");
+import { useState } from "react";
 
 const Popover = ({ children }) => {
   const [open, setOpen] = useState(false);
