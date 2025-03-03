@@ -223,8 +223,8 @@ export default function DoctorRegistrationForm() {
     fileData.append("Bio", formData.bio || "")
     fileData.append("HourlyRate", formData.hourlyRate)
     fileData.append("Designation", formData.designation)
-    fileData.append("Category", formData.category ? "Yes" : "No")
-    fileData.append("TermsAccepted", formData.terms)
+    fileData.append("Category", formData.category)
+    fileData.append("TermsAccepted", formData.terms ? "Yes" : "No")
 
     // Append available days as a comma-separated string
     const availableDays = Object.keys(formData.availableDays)
