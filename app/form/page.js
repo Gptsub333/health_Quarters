@@ -104,7 +104,7 @@ export default function FormPage() {
     formData.append("ZipCode", data.postalCode)
     formData.append("Country", data.country)
     formData.append("FinancialInstrument", data.financialInstrument || data.otherFinancialInstrument || "")
-    formData.append("RaisingCapital", isRaising)
+    formData.append("RaisingCapital", isRaising ? "Yes" : "No")
 
     // Add these lines to your FormData section
     formData.append("RaiseAmount", data.raiseAmount || "")
@@ -135,7 +135,7 @@ export default function FormPage() {
 
     try {
       // Send the form data (including files) to the backend
-      const response = await fetch("https://healthquarters-backend.onrender.com/upload_to_startups", {
+      const response = await fetch("http://localhost:8000/upload_to_startups", {
         method: "POST",
         body: formData,
       })
@@ -144,57 +144,59 @@ export default function FormPage() {
         const responseData = await response.json()
         console.log("Success:", responseData)
         setIsSubmitted(true) // Form submitted successfully
+
+        const templateParams = {
+          user_name: data.founderFirstName,
+          user_name: `${data.founderFirstName} ${data.founderLastName}`,
+          user_email: data.email, // User's email (dynamic)
+          user_message: data.companyDescription, // Message content
+          owner_email: "gpt.subscription@springtown.ai", // Owner's email (fixed)
+          company_name: data.companyName,
+          company_website: data.companyWebsite,
+          referral_source: data.referralSource || data.otherReferralSource || "N/A",
+          company_description: data.companyDescription,
+          problem_solved: data.problemSolved,
+          solution: data.solution,
+          business_model: data.businessModel || data.otherBusinessModel || "N/A",
+          inception_date: inceptionDate ? format(inceptionDate, "yyyy-MM-dd") : "N/A",
+          current_stage: data.stagevalue,
+          industry: data.industry,
+          sector: data.sector || data.otherSector || "N/A",
+          city: data.city,
+          state: data.stateProvince,
+          zip_code: data.postalCode,
+          country: data.country,
+          financial_instrument: data.financialInstrument || data.otherFinancialInstrument || "N/A",
+          raising_capital: data.isRaisingCapital ? "Yes" : "No",
+          capital_raised: data.totalCapitalRaised,
+          employees_fulltime: data.fullTimeEmployees,
+          employees_parttime: data.partTimeStaff,
+          last_year_revenue: data.lastYearRevenue,
+          paying_customers: data.payingCustomers,
+          pilot_customers: data.pilotPrograms,
+        };
+    
+    
+        emailjs
+          .send(
+            "service_has3ls7", // Replace with EmailJS Service ID
+            "template_aonjlu8", // Replace with EmailJS Template ID
+            templateParams,
+            "Xc8OdGbltUPViTZkq" // Replace with EmailJS Public Key
+          )
+          .then(() => {
+            // alert("Email sent successfully to " + formData.email + " and owner!");
+          })
+          .catch(() => {
+            // alert("Failed to send email: " + error.text);
+          });
       } else {
         console.error("Error submitting form")
       }
     } catch (error) {
       console.error("Error:", error)
     }
-    const templateParams = {
-      user_name: data.founderFirstName,
-      user_name: `${data.founderFirstName} ${data.founderLastName}`,
-      user_email: data.email, // User's email (dynamic)
-      user_message: data.companyDescription, // Message content
-      owner_email: "gpt.subscription@springtown.ai", // Owner's email (fixed)
-      company_name: data.companyName,
-      company_website: data.companyWebsite,
-      referral_source: data.referralSource || data.otherReferralSource || "N/A",
-      company_description: data.companyDescription,
-      problem_solved: data.problemSolved,
-      solution: data.solution,
-      business_model: data.businessModel || data.otherBusinessModel || "N/A",
-      inception_date: inceptionDate ? format(inceptionDate, "yyyy-MM-dd") : "N/A",
-      current_stage: data.stagevalue,
-      industry: data.industry,
-      sector: data.sector || data.otherSector || "N/A",
-      city: data.city,
-      state: data.stateProvince,
-      zip_code: data.postalCode,
-      country: data.country,
-      financial_instrument: data.financialInstrument || data.otherFinancialInstrument || "N/A",
-      raising_capital: data.isRaisingCapital ? "Yes" : "No",
-      capital_raised: data.totalCapitalRaised,
-      employees_fulltime: data.fullTimeEmployees,
-      employees_parttime: data.partTimeStaff,
-      last_year_revenue: data.lastYearRevenue,
-      paying_customers: data.payingCustomers,
-      pilot_customers: data.pilotPrograms,
-    };
-
-
-    emailjs
-      .send(
-        "service_has3ls7", // Replace with EmailJS Service ID
-        "template_aonjlu8", // Replace with EmailJS Template ID
-        templateParams,
-        "Xc8OdGbltUPViTZkq" // Replace with EmailJS Public Key
-      )
-      .then(() => {
-        // alert("Email sent successfully to " + formData.email + " and owner!");
-      })
-      .catch(() => {
-        // alert("Failed to send email: " + error.text);
-      });
+    
 
 
   }

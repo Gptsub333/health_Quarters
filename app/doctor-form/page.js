@@ -223,7 +223,7 @@ export default function DoctorRegistrationForm() {
     fileData.append("Bio", formData.bio || "")
     fileData.append("HourlyRate", formData.hourlyRate)
     fileData.append("Designation", formData.designation)
-    fileData.append("Category", formData.category)
+    fileData.append("Category", formData.category ? "Yes" : "No")
     fileData.append("TermsAccepted", formData.terms)
 
     // Append available days as a comma-separated string
@@ -259,15 +259,36 @@ export default function DoctorRegistrationForm() {
       console.log("Submitting to API endpoint...")
       // For FormData (with file uploads)
       // Replace with your actual API endpoint
-      const response = await fetch("https://healthquarters-backend.onrender.com/upload_to_experts", {
+      const response = await fetch("http://localhost:8000/upload_to_experts", {
         method: "POST",
         body: fileData,
         // Don't set Content-Type header when sending FormData
       })
 
       if (response.ok) {
-        console.log("Registration successful!")
         alert("Registration successful! Thank you for joining our medical expert community.")
+
+        // const templateParams = {
+        //   user_name: formData.firstName,
+        //   user_email: formData.email, // User's email (dynamic)
+        //   user_message: formData.title, // Message content
+        //   owner_email: "gpt.subscription@springtown.ai", // Owner's email (fixed)
+        // };
+    
+        // emailjs
+        //   .send(
+        //     "service_has3ls7", // Replace with EmailJS Service ID
+        //     "template_aonjlu8", // Replace with EmailJS Template ID
+        //     templateParams,
+        //     "Xc8OdGbltUPViTZkq" // Replace with EmailJS Public Key
+        //   )
+        //   .then(() => {
+        //     // alert("Email sent successfully to " + formData.email + " and owner!");
+        //   })
+        //   .catch((error) => {
+        //     alert("Failed to send email: " + error.text);
+        //   });
+
         // Redirect to success page or dashboard
         router.push("/")
       } else {
@@ -282,26 +303,7 @@ export default function DoctorRegistrationForm() {
       setIsSubmitting(false)
     }
 
-    const templateParams = {
-      user_name: formData.firstName,
-      user_email: formData.email, // User's email (dynamic)
-      user_message: formData.title, // Message content
-      owner_email: "gpt.subscription@springtown.ai", // Owner's email (fixed)
-    };
-
-    emailjs
-      .send(
-        "service_has3ls7", // Replace with EmailJS Service ID
-        "template_aonjlu8", // Replace with EmailJS Template ID
-        templateParams,
-        "Xc8OdGbltUPViTZkq" // Replace with EmailJS Public Key
-      )
-      .then(() => {
-        //alert("Email sent successfully to " + formData.email + " and owner!");
-      })
-      .catch(() => {
-        //alert("Failed to send email: " + error.text);
-      });
+   
   }
 
   const nextStep = (e) => {

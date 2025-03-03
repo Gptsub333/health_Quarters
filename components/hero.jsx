@@ -8,7 +8,7 @@ export function Hero({ content }) {
   return (
     <section className="min-h-screen bg-gradient-to-br from-pink-50 to-yellow-50 px-4 py-16 sm:py-12 md:py-16 md:px-8 mb-10 sm:mb-16 md:mb-20 overflow-hidden">
       <div className="mx-auto w-full sm:w-[90%] md:w-[85%] lg:w-[80%] max-w-[1700px]">
-        <nav className="mb-8 sm:mb-12 md:mb-16 lg:mb-[9rem] flex justify-between items-center">
+        <nav className="mb-8 sm:mb-12 md:mb-16 flex justify-between items-center">
         <Image
             src={hq}
             alt="My SVG Icon"

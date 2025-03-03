@@ -9,9 +9,8 @@ export function Footer({ content }) {
         <div className="grid grid-cols-1 gap-8 pb-8 md:grid-cols-3 md:gap-12 border-b">
           <div className="flex flex-col">
             <div className="mb-4 text-xl sm:text-2xl md:text-[30px] font-extrabold bg-gradient-to-r from-[#1E2B58] to-[#6C5CE7] bg-clip-text text-transparent">
-              HEALTHQUARTERS.AI
               {/* HEALTHQUARTERS AI. */}
-              <Image src={hq} alt="My SVG Icon" width={200} height={200} />
+              <Image src={hq} alt="My SVG Icon" width={200} height={200} className='ml-[-9px] my-[-35px]' />
             </div>
             <p className="text-sm text-gray-500 max-w-xs">
               Transforming healthcare through innovative AI solutions that empower providers and improve patient outcomes.
