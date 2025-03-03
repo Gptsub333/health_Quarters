@@ -184,7 +184,7 @@ export default function FormPage() {
       .then(() => {
         // alert("Email sent successfully to " + formData.email + " and owner!");
       })
-      .catch((error) => {
+      .catch(() => {
         // alert("Failed to send email: " + error.text);
       });
 
@@ -271,7 +271,7 @@ export default function FormPage() {
             <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-12 py-10 rounded-t-3xl">
               <CardTitle className="text-4xl font-bold tracking-wide text-center">Submission Received</CardTitle>
               <CardDescription className="text-white text-lg mt-3 text-center leading-relaxed">
-                Thank you for your application! We will review it soon and reach out if there's a potential fit.
+                {"Thank you for your application! We will review it soon and reach out if there's a potential fit."}
               </CardDescription>
             </CardHeader>
 
