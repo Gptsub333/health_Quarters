@@ -318,7 +318,7 @@ export default function FormPage() {
               </div>
             </div>
 
-            <form onSubmit={(event)=>handleSubmit(onSubmit(event))}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <CardContent className="p-6 md:p-8 space-y-8 overflow-auto">
                 {currentStep === 1 && (
                   <div className="space-y-6 animate-fade-in">
