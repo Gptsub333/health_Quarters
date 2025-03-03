@@ -1,6 +1,10 @@
 import React from "react";
 import { useState } from "react";
 
+const cn = (...classes) => {
+  return classes.filter(Boolean).join(" ")
+}
+
 const Popover = ({ children }) => {
   const [open, setOpen] = useState(false);
 
