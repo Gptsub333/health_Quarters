@@ -1,3 +1,7 @@
+const cn = (...classes) => {
+    return classes.filter(Boolean).join(" ")
+}
+
 const Calendar = ({ selected, onSelect }) => {
     const [currentMonth, setCurrentMonth] = useState(selected || new Date())
 
