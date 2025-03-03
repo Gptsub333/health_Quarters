@@ -259,7 +259,7 @@ export default function DoctorRegistrationForm() {
       console.log("Submitting to API endpoint...")
       // For FormData (with file uploads)
       // Replace with your actual API endpoint
-      const response = await fetch("http://localhost:8000/upload_to_experts", {
+      const response = await fetch("https://healthquarters-backend.onrender.com/upload_to_experts", {
         method: "POST",
         body: fileData,
         // Don't set Content-Type header when sending FormData

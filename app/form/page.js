@@ -135,7 +135,7 @@ export default function FormPage() {
 
     try {
       // Send the form data (including files) to the backend
-      const response = await fetch("http://localhost:8000/upload_to_startups", {
+      const response = await fetch("https://healthquarters-backend.onrender.com/upload_to_startups", {
         method: "POST",
         body: formData,
       })
