@@ -6,6 +6,21 @@ import { useForm } from "react-hook-form"
 import { format } from "date-fns"
 import { CalendarIcon, Upload } from "lucide-react"
 import Input from "@/components/ui/input"
+import Label from "@/components/Label/label"
+import Calendar from "@/components/calendar/calendar"
+import Select from "@/components/select/select"
+import SelectItem from "@/components/selectItem/selectItem"
+import RadioGroupItem from "@/components/RadioGroupItem/RadioGroupItem"
+import RadioGroup from "@/components/RadioGroup/RadioGroup"
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter
+} from "@/components/Card/card"
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/Popover/popover"
 
 // Utility function
 const cn = (...classes) => {
@@ -29,330 +44,6 @@ const Button = ({ className, variant = "default", children, ...props }) => {
   )
 }
 
-
-
-const Label = ({ className, ...props }) => {
-  return (
-    <label
-      className={cn(
-        "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-        className,
-      )}
-      {...props}
-    />
-  )
-}
-
-const Select = ({ children, onValueChange, defaultValue, value, ...props }) => {
-  const [open, setOpen] = useState(false)
-  const [selectedValue, setSelectedValue] = useState(value || defaultValue || "")
-
-  const handleSelect = (value) => {
-    setSelectedValue(value)
-    setOpen(false)
-    if (onValueChange) onValueChange(value)
-  }
-
-  return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        {...props}
-      >
-        <span className={selectedValue ? "" : "text-muted-foreground"}>
-          {selectedValue
-            ? React.Children.toArray(children).find((child) => child.props.value === selectedValue)?.props.children ||
-              "Select an option"
-            : "Select an option"}
-        </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-4 w-4 opacity-50"
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
-      {open && (
-        <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover text-popover-foreground shadow-md">
-          <div className="p-1">
-            {React.Children.map(children, (child) =>
-              React.cloneElement(child, {
-                onSelect: () => handleSelect(child.props.value),
-              }),
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-const SelectItem = ({ children, onSelect }) => {
-  return (
-    <div
-      onClick={onSelect}
-      className="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-    >
-      <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-4 w-4"
-        >
-          <path d="M5 12l5 5 9-9" />
-        </svg>
-      </span>
-      <span>{children}</span>
-    </div>
-  )
-}
-
-const Card = ({ className, ...props }) => {
-  return <div className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)} {...props} />
-}
-
-const CardHeader = ({ className, ...props }) => {
-  return <div className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />
-}
-
-const CardTitle = ({ className, ...props }) => {
-  return <h3 className={cn("text-2xl font-semibold leading-none tracking-tight", className)} {...props} />
-}
-
-const CardDescription = ({ className, ...props }) => {
-  return <p className={cn("text-sm text-muted-foreground", className)} {...props} />
-}
-
-const CardContent = ({ className, ...props }) => {
-  return <div className={cn("p-6 pt-0", className)} {...props} />
-}
-
-const CardFooter = ({ className, ...props }) => {
-  return <div className={cn("flex items-center p-6 pt-0", className)} {...props} />
-}
-
-const Popover = ({ children }) => {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <div className="relative">
-      {React.Children.map(children, (child) =>
-        React.cloneElement(child, {
-          open,
-          setOpen,
-        }),
-      )}
-    </div>
-  )
-}
-
-const PopoverTrigger = ({ children, open, setOpen }) => {
-  return React.cloneElement(children, {
-    onClick: () => setOpen(!open),
-  })
-}
-
-const PopoverContent = ({ children, className, open }) => {
-  if (!open) return null
-
-  return (
-    <div className={cn("absolute z-50 w-72 rounded-md border bg-popover p-4 shadow-md outline-none", className)}>
-      {children}
-    </div>
-  )
-}
-
-const Calendar = ({ selected, onSelect }) => {
-  const [currentMonth, setCurrentMonth] = useState(selected || new Date())
-
-  // Get days in a specific month
-  const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate()
-
-  // Get the first day of the month (for correct positioning in the calendar)
-  const firstDayOfMonth = (year, month) => new Date(year, month, 1).getDay()
-
-  // Get the current year and month
-  const year = currentMonth.getFullYear()
-  const month = currentMonth.getMonth()
-
-  // Array to hold all the days for the current month
-  const days = []
-  const daysCount = daysInMonth(year, month)
-  const firstDay = firstDayOfMonth(year, month)
-
-  // Fill the array with empty slots for days before the 1st of the month
-  for (let i = 0; i < firstDay; i++) {
-    days.push(null)
-  }
-
-  // Push the days for the current month
-  for (let i = 1; i <= daysCount; i++) {
-    days.push(new Date(year, month, i))
-  }
-
-  // Handle going to the previous month
-  const handlePrevMonth = () => {
-    setCurrentMonth(new Date(year, month - 1, 1))
-  }
-
-  // Handle going to the next month
-  const handleNextMonth = () => {
-    setCurrentMonth(new Date(year, month + 1, 1))
-  }
-
-  // Handle changing the year
-  const handleYearChange = (e) => {
-    const newYear = e.target.value
-    if (newYear && !isNaN(newYear)) {
-      setCurrentMonth(new Date(newYear, month, 1))
-    }
-  }
-
-  // Check if a date is selected
-  const isSelected = (date) => {
-    if (!selected || !date) return false
-    return date.toDateString() === selected.toDateString()
-  }
-
-  return (
-    <div className="p-3">
-      <div className="flex justify-between items-center mb-2">
-        {/* Previous Month Button */}
-        <button onClick={handlePrevMonth} className="p-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-4 w-4"
-          >
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-        </button>
-
-        {/* Month and Year Display */}
-        <div className="flex items-center space-x-2">
-          <button onClick={handlePrevMonth} className="text-lg">
-            <span className="mr-2">{currentMonth.toLocaleString("default", { month: "long" })}</span>
-            <input
-              type="number"
-              value={year}
-              onChange={handleYearChange}
-              className="w-16 text-center border-b focus:outline-none"
-            />
-          </button>
-        </div>
-
-        {/* Next Month Button */}
-        <button onClick={handleNextMonth} className="p-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-4 w-4"
-          >
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Weekdays Header */}
-      <div className="grid grid-cols-7 gap-1 text-center text-xs">
-        {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day, i) => (
-          <div key={i} className="p-1">
-            {day}
-          </div>
-        ))}
-      </div>
-
-      {/* Days Grid */}
-      <div className="grid grid-cols-7 gap-1 mt-1">
-        {days.map((date, i) => (
-          <div key={i} className="p-0">
-            {date ? (
-              <button
-                onClick={() => onSelect(date)}
-                className={cn(
-                  "h-8 w-8 rounded-md p-0 text-center text-sm",
-                  isSelected(date) ? "bg-primary text-primary-foreground" : "hover:bg-accent",
-                )}
-              >
-                {date.getDate()}
-              </button>
-            ) : (
-              <div className="h-8 w-8" />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-const RadioGroup = ({ children, onValueChange, className }) => {
-  const [value, setValue] = useState("")
-
-  const handleChange = (newValue) => {
-    setValue(newValue)
-    if (onValueChange) onValueChange(newValue)
-  }
-
-  return (
-    <div className={className}>
-      {React.Children.map(children, (child) =>
-        React.cloneElement(child, {
-          checked: value === child.props.value,
-          onChange: () => handleChange(child.props.value),
-        }),
-      )}
-    </div>
-  )
-}
-
-const RadioGroupItem = ({ children, checked, onChange, id }) => {
-  return (
-    <div className="flex items-center space-x-2">
-      <input
-        type="radio"
-        id={id}
-        checked={checked}
-        onChange={onChange}
-        className="h-4 w-4 rounded-full border-gray-300 text-primary focus:ring-primary"
-      />
-      {children}
-    </div>
-  )
-}
-
-// Main Form Component
 export default function FormPage() {
   const {
     register,
@@ -389,6 +80,11 @@ export default function FormPage() {
     event.stopPropagation() // Prevent the event from bubbling up
 
     // Prepare the form data
+  const onSubmit = async (data, event) => {
+    console.log("data", data)
+    console.log("event", event)
+    event.stopPropagation()
+    event.preventDefault()
     const formData = new FormData()
     formData.append("FirstName", data.founderFirstName)
     formData.append("LastName", data.founderLastName)
@@ -495,7 +191,7 @@ export default function FormPage() {
       fields[3].push("otherFinancialInstrument")
     }
 
-    // Trigger validation for all fields in the current step
+
     const stepValid = await trigger(fields[step])
     if (!stepValid) {
       isValid = false
@@ -520,57 +216,11 @@ export default function FormPage() {
     window.scrollTo(0, 0)
   }
 
-  // Add CSS styles directly in the component
-  const styles = `
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
 
-    :root {
-      --background: 0 0% 100%;
-      --foreground: 222.2 84% 4.9%;
-      --card: 0 0% 100%;
-      --card-foreground: 222.2 84% 4.9%;
-      --popover: 0 0% 100%;
-      --popover-foreground: 222.2 84% 4.9%;
-      --primary: 221.2 83.2% 53.3%;
-      --primary-foreground: 210 40% 98%;
-      --secondary: 210 40% 96.1%;
-      --secondary-foreground: 222.2 47.4% 11.2%;
-      --muted: 210 40% 96.1%;
-      --muted-foreground: 215.4 16.3% 46.9%;
-      --accent: 210 40% 96.1%;
-      --accent-foreground: 222.2 47.4% 11.2%;
-      --destructive: 0 84.2% 60.2%;
-      --destructive-foreground: 210 40% 98%;
-      --border: 214.3 31.8% 91.4%;
-      --input: 214.3 31.8% 91.4%;
-      --ring: 221.2 83.2% 53.3%;
-      --radius: 0.5rem;
-    }
-
-    @keyframes fade-in {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .animate-fade-in {
-      animation: fade-in 0.3s ease-out forwards;
-    }
-  `
 
   if (isSubmitted) {
     return (
       <>
-        <style jsx global>
-          {styles}
-        </style>
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50 p-4">
           <Card className="w-full max-w-3xl shadow-lg border-0 overflow-hidden bg-white transition-all duration-500 animate-fade-in">
             <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-8">
@@ -615,9 +265,6 @@ export default function FormPage() {
 
   return (
     <>
-      <style jsx global>
-        {styles}
-      </style>
       <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
           <Card className="border-0 shadow-lg overflow-hidden bg-white transition-all duration-500">
@@ -635,13 +282,12 @@ export default function FormPage() {
                     {/* Step Circle */}
                     <button
                       onClick={() => setCurrentStep(step.number)}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-2 relative z-10 transition-all duration-300 ${
-                        currentStep > step.number
-                          ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white shadow-md"
-                          : currentStep === step.number
-                            ? "bg-white text-blue-600 border-2 border-blue-500 shadow-md"
-                            : "bg-white text-gray-400 border-2 border-gray-200"
-                      }`}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-2 relative z-10 transition-all duration-300 ${currentStep > step.number
+                        ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white shadow-md"
+                        : currentStep === step.number
+                          ? "bg-white text-blue-600 border-2 border-blue-500 shadow-md"
+                          : "bg-white text-gray-400 border-2 border-gray-200"
+                        }`}
                     >
                       {currentStep > step.number ? (
                         <svg
@@ -660,9 +306,8 @@ export default function FormPage() {
 
                     {/* Step Label */}
                     <span
-                      className={`text-xs font-medium mt-1 text-center transition-colors duration-300 ${
-                        currentStep >= step.number ? "text-blue-600" : "text-gray-500"
-                      } hidden sm:block`}
+                      className={`text-xs font-medium mt-1 text-center transition-colors duration-300 ${currentStep >= step.number ? "text-blue-600" : "text-gray-500"
+                        } hidden sm:block`}
                     >
                       {step.label}
                     </span>
@@ -901,7 +546,6 @@ export default function FormPage() {
                         <span className="text-gray-400 ml-1 text-xs font-normal">(When was the company founded?)</span>
                       </Label>
 
-                      {/* Calendar Popover */}
                       <Popover open={isOpen} onOpenChange={setIsOpen}>
                         <PopoverTrigger asChild>
                           <Button
@@ -938,7 +582,6 @@ export default function FormPage() {
                           </Button>
                         </PopoverTrigger>
 
-                        {/* Popover Content with Calendar */}
                         <PopoverContent className="p-0 border border-gray-200 rounded-lg shadow-lg w-auto">
                           <Calendar
                             mode="single"
@@ -1500,4 +1143,3 @@ export default function FormPage() {
     </>
   )
 }
-
