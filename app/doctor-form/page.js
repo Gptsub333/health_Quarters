@@ -418,15 +418,7 @@ export default function DoctorRegistrationForm() {
                           : "Documents"}
                   </div>
                 </div>
-                {step < 4 && (
-                  <div className="hidden sm:block absolute w-full top-5">
-                    <div
-                      className={`h-0.5 ${
-                        step < currentStep ? "bg-gradient-to-r from-indigo-600 to-purple-600" : "bg-gray-200"
-                      }`}
-                    ></div>
-                  </div>
-                )}
+                
               </div>
             ))}
           </div>
@@ -853,7 +845,7 @@ export default function DoctorRegistrationForm() {
                               htmlFor="image"
                               className="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none"
                             >
-                              <span>Upload a file</span>
+                              <div className="flex justify-center w-[500px]">Upload a file</div>
                               <input
                                 id="image"
                                 name="image"
@@ -866,6 +858,10 @@ export default function DoctorRegistrationForm() {
                             </label>
                           </div>
                           <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
+                          {/* Display the uploaded file name */}
+          {formData?.image?.name && (
+            <p className="text-sm text-blue-300 mt-2">{formData?.image?.name}</p>
+          )}
                         </div>
                       </div>
                       {errors.image && <p className="mt-1 text-sm text-red-500">{errors.image}</p>}
@@ -896,7 +892,8 @@ export default function DoctorRegistrationForm() {
                               htmlFor="documents"
                               className="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none"
                             >
-                              <span>Upload a file</span>
+                          
+                              <div className="flex justify-center w-[500px]">Upload a file</div>
                               <input
                                 id="documents"
                                 name="documents"
@@ -909,6 +906,10 @@ export default function DoctorRegistrationForm() {
                             </label>
                           </div>
                           <p className="text-xs text-gray-500">PDF, DOC up to 10MB</p>
+                                    {/* Display the uploaded file name */}
+          {formData?.documents?.name && (
+            <p className="text-sm text-blue-300 mt-2">{formData?.documents?.name}</p>
+          )}
                         </div>
                       </div>
                       {errors.documents && <p className="mt-1 text-sm text-red-500">{errors.documents}</p>}

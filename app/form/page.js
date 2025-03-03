@@ -300,8 +300,7 @@ export default function FormPage() {
                   <div key={step.number} className="relative flex flex-col items-center">
                     {/* Step Circle */}
                     <button
-                      onClick={() => setCurrentStep(step.number)}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-2 relative z-10 transition-all duration-300 ${currentStep > step.number
+                      className={`w-10 h-10 cursor-default rounded-full flex items-center justify-center text-sm font-medium mb-2 relative z-10 transition-all duration-300 ${currentStep > step.number
                         ? "bg-gradient-to-r from-indigo-500 to-blue-500 text-white shadow-md"
                         : currentStep === step.number
                           ? "bg-white text-blue-600 border-2 border-blue-500 shadow-md"
@@ -786,15 +785,16 @@ export default function FormPage() {
                       <RadioGroup
                         onValueChange={(value) => setValue("isRaisingCapital", value)}
                         className="flex space-x-4 mt-1"
+                        name="isRaisingCapital"
                       >
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="yes" id="raising-yes" />
+                          <input type="radio" value="yes" id="raising-yes" name="isRaisingCapital"/>
                           <Label htmlFor="raising-yes" className="font-normal">
                             Yes
                           </Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="no" id="raising-no" />
+                          <input type="radio" value="no" id="raising-no" name="isRaisingCapital"/>
                           <Label htmlFor="raising-no" className="font-normal">
                             No
                           </Label>

@@ -73,7 +73,7 @@ export default function StartupGrowthTimeline() {
             </span>
           </h2>
           <p className="max-w-2xl mx-auto text-xl text-[#1E2B58] opacity-90">
-            HealthQuarterAI guides you through every stage of your startup&apos;s evolution
+            HealthQuarter.AI guides you through every stage of your startup&apos;s evolution
           </p>
         </div>
 
@@ -185,7 +185,7 @@ export default function StartupGrowthTimeline() {
         >
           <div className="inline-block p-1 rounded-full bg-gradient-to-r from-[#1E2B58] to-[#1E2B58]/80">
             <button className="px-8 py-3 rounded-full bg-white text-[#1E2B58] font-bold text-lg hover:bg-[#f5f7fd] transition-all duration-300 transform hover:scale-105">
-              Join HealthQuarterAI Community
+              Join HealthQuarter.AI Community
             </button>
           </div>
           <p className="mt-4 text-[#1E2B58] max-w-md mx-auto">

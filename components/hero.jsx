@@ -45,7 +45,7 @@ export function Hero({ content }) {
           
           <div className="animate-[float_6s_ease-in-out_infinite] relative w-full self-center md:self-start order-1 md:order-2 mb-8 md:mb-0">
             <span className="text-outline hidden sm:block">
-                HEALTHQUARTERS
+                HEALTHQUARTERS.AI
             </span>
             <div className="relative w-full h-48 sm:h-64 md:h-80 lg:h-96">
               <Image

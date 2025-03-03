@@ -14,8 +14,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Health Quarters AI",
-  description: "At HealthQuarters our venture club is more than just a support system—it's a vibrant community where healthcare innovators connect, share, and evolve.",
+  title: "HealthQuarters.AI",
+  description: "At HealthQuartersAI our venture club is more than just a support system—it's a vibrant community where healthcare innovators connect, share, and evolve.",
 };
 
 export default function RootLayout({
