@@ -297,10 +297,10 @@ export default function DoctorRegistrationForm() {
         "Xc8OdGbltUPViTZkq" // Replace with EmailJS Public Key
       )
       .then(() => {
-        alert("Email sent successfully to " + formData.email + " and owner!");
+        //alert("Email sent successfully to " + formData.email + " and owner!");
       })
-      .catch((error) => {
-        alert("Failed to send email: " + error.text);
+      .catch(() => {
+        //alert("Failed to send email: " + error.text);
       });
   }
 
