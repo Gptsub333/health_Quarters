@@ -384,8 +384,9 @@ export default function FormPage() {
     { number: 4, label: "Documents" },
   ]
 
-  const onSubmit = async (data, event) => {
+  const onSubmit = async ( event,data) => {
     event.preventDefault() // Prevent the default form submission behavior
+    event.stopPropagation() // Prevent the event from bubbling up
 
     // Prepare the form data
     const formData = new FormData()
@@ -400,7 +401,7 @@ export default function FormPage() {
     formData.append("Solution", data.solution)
     formData.append("BusinessModel", data.businessModel || data.otherBusinessModel || "")
     formData.append("InceptionDate", inceptionDate ? format(inceptionDate, "yyyy-MM-dd") : "")
-    formData.append("CurrentStage", data.referralSource)
+    formData.append("CurrentStage", data.stagevalue)
     formData.append("Industry", data.industry)
     formData.append("Sector", data.sector || data.otherSector || "")
     formData.append("City", data.city)
@@ -677,7 +678,7 @@ export default function FormPage() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={(event)=>handleSubmit(onSubmit(event))}>
               <CardContent className="p-6 md:p-8 space-y-8 overflow-auto">
                 {currentStep === 1 && (
                   <div className="space-y-6 animate-fade-in">
@@ -965,10 +966,10 @@ export default function FormPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-1">
-                        <Label htmlFor="referralSource" className="text-sm font-medium">
+                        <Label htmlFor="stagevalue" className="text-sm font-medium">
                           What stage is your business? *
                         </Label>
-                        <Select onValueChange={(value) => setValue("referralSource", value)} defaultValue="">
+                        <Select onValueChange={(value) => setValue("stagevalue", value)} defaultValue="">
                           <SelectItem value="idea">Idea Stage</SelectItem>
                           <SelectItem value="pre_seed">Pre-Seed</SelectItem>
                           <SelectItem value="seed">Seed</SelectItem>

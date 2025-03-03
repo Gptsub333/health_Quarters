@@ -1,10 +1,81 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation" // ✅ Import useRouter
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
+import Input from "@/components/ui/input"
+import { useForm } from "react-hook-form"
+
+const cn = (...classes) => {
+  return classes.filter(Boolean).join(" ")
+}
+
+const categories = [
+  {
+    id: 1,
+    title: "Clinical Leadership",
+    description: "Expert guidance in medical leadership and clinical excellence",
+    expertise: ["Hospital Management", "Clinical Protocols", "Team Leadership"],
+    members: 48,
+    rating: 4.9,
+    gradient: "from-rose-400 to-orange-400",
+    shadowColor: "shadow-rose-200",
+  },
+  {
+    id: 2,
+    title: "Research & Innovation",
+    description: "Pioneering medical research and breakthrough innovations",
+    expertise: ["Clinical Trials", "Research Methods", "Data Analysis"],
+    members: 35,
+    rating: 4.8,
+    gradient: "from-blue-400 to-cyan-400",
+    shadowColor: "shadow-blue-200",
+  },
+  {
+    id: 3,
+    title: "Healthcare Technology",
+    description: "Digital transformation in healthcare delivery",
+    expertise: ["Digital Health", "AI in Medicine", "Health Informatics"],
+    members: 42,
+    rating: 4.7,
+    gradient: "from-violet-400 to-purple-400",
+    shadowColor: "shadow-violet-200",
+  },
+  {
+    id: 4,
+    title: "Patient Care Excellence",
+    description: "Advanced patient care and experience optimization",
+    expertise: ["Patient Experience", "Care Protocols", "Quality Metrics"],
+    members: 56,
+    rating: 4.9,
+    gradient: "from-emerald-400 to-teal-400",
+    shadowColor: "shadow-emerald-200",
+  },
+  {
+    id: 5,
+    title: "Medical Education",
+    description: "Training and development in healthcare",
+    expertise: ["Clinical Training", "Medical Education", "Skill Development"],
+    members: 39,
+    rating: 4.8,
+    gradient: "from-amber-400 to-yellow-400",
+    shadowColor: "shadow-amber-200",
+  },
+  {
+    id: 6,
+    title: "Healthcare Strategy",
+    description: "Strategic planning and healthcare management",
+    expertise: ["Strategic Planning", "Healthcare Policy", "Operations"],
+    members: 31,
+    rating: 4.7,
+    gradient: "from-pink-400 to-rose-400",
+    shadowColor: "shadow-pink-200",
+  },
+]
 
 export default function DoctorRegistrationForm() {
+  const {  } = useForm()
+
   const [formData, setFormData] = useState({
     title: "",
     firstName: "",
@@ -38,7 +109,7 @@ export default function DoctorRegistrationForm() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [focusedField, setFocusedField] = useState("")
-  const router = useRouter() // ✅ Initialize router
+  const router = useRouter()
   const [errors, setErrors] = useState({})
 
   const handleInputFocus = (fieldName) => {
@@ -83,6 +154,18 @@ export default function DoctorRegistrationForm() {
     return !error
   }
 
+  const Label = ({ className, ...props }) => {
+    return (
+      <label
+        className={cn(
+          "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+          className,
+        )}
+        {...props}
+      />
+    )
+  }
+
   const handleInputChange = (e) => {
     const { name, value, type } = e.target
     if (type === "file") {
@@ -108,55 +191,21 @@ export default function DoctorRegistrationForm() {
     }
   }
 
+  console.log(currentStep)
+
   const handleSubmit = async (e) => {
     e.preventDefault() // Prevent the default form submission behavior
+    e.stopPropagation() // Prevent the form event from bubbling up the DOM
     console.log("Form submission started")
 
-    // Basic validation
-    const requiredFields = {
-      title: "Title",
-      firstName: "First Name",
-      email: "Email",
-      phone: "Phone",
-      specialization: "Specialization",
-      experience: "Years of Experience",
-      license: "Medical License Number",
-      hourlyRate: "Hourly Rate",
-      category: "Expertise Category",
-      image: "Profile Photo",
-      documents: "Medical License Document",
-      terms: "Terms and Conditions",
-    }
 
-    // Check if any required fields are empty
-    const missingFields = []
-    Object.entries(requiredFields).forEach(([field, label]) => {
-      if (field === "terms" && !formData[field]) {
-        missingFields.push(label)
-      } else if (field !== "terms" && (!formData[field] || formData[field] === "")) {
-        missingFields.push(label)
-      }
-    })
-
-    // Check if at least one day is selected
-    const hasSelectedDay = Object.values(formData.availableDays).some((day) => day)
-    if (!hasSelectedDay) {
-      missingFields.push("Available Days (at least one)")
-    }
-
-    // Show alert if any required fields are missing
-    if (missingFields.length > 0) {
-      console.log("Missing required fields:", missingFields)
-      alert(`Please fill in the following required fields: ${missingFields.join(", ")}`)
-      return
-    }
 
     setIsSubmitting(true)
     console.log("Validation passed, preparing form data")
 
     // Prepare the form data
     const fileData = new FormData()
-    
+
     // Append all text fields to FormData
     fileData.append("Title", formData.title)
     fileData.append("FirstName", formData.firstName)
@@ -174,7 +223,7 @@ export default function DoctorRegistrationForm() {
     fileData.append("Designation", formData.designation)
     fileData.append("Category", formData.category)
     fileData.append("TermsAccepted", formData.terms)
-    
+
     // Append available days as a comma-separated string
     const availableDays = Object.keys(formData.availableDays)
       .filter((day) => formData.availableDays[day])
@@ -194,6 +243,7 @@ export default function DoctorRegistrationForm() {
 
     // Log the form data being submitted
     console.log("Form data being submitted:")
+    console.log(fileData)
     for (const [key, value] of fileData.entries()) {
       // Don't log the full file objects, just their names
       if (value instanceof File) {
@@ -231,7 +281,9 @@ export default function DoctorRegistrationForm() {
     }
   }
 
-  const nextStep = () => {
+  const nextStep = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
     let canProceed = true
 
     // Validate fields based on current step
@@ -283,79 +335,6 @@ export default function DoctorRegistrationForm() {
   const prevStep = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1))
   }
-
-  const InputWrapper = ({ children, label, required = false, name }) => (
-    <div className="relative">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      {children}
-      {errors[name] && <p className="mt-1 text-sm text-red-500">{errors[name]}</p>}
-    </div>
-  )
-
-  const categories = [
-    {
-      id: 1,
-      title: "Clinical Leadership",
-      description: "Expert guidance in medical leadership and clinical excellence",
-      expertise: ["Hospital Management", "Clinical Protocols", "Team Leadership"],
-      members: 48,
-      rating: 4.9,
-      gradient: "from-rose-400 to-orange-400",
-      shadowColor: "shadow-rose-200",
-    },
-    {
-      id: 2,
-      title: "Research & Innovation",
-      description: "Pioneering medical research and breakthrough innovations",
-      expertise: ["Clinical Trials", "Research Methods", "Data Analysis"],
-      members: 35,
-      rating: 4.8,
-      gradient: "from-blue-400 to-cyan-400",
-      shadowColor: "shadow-blue-200",
-    },
-    {
-      id: 3,
-      title: "Healthcare Technology",
-      description: "Digital transformation in healthcare delivery",
-      expertise: ["Digital Health", "AI in Medicine", "Health Informatics"],
-      members: 42,
-      rating: 4.7,
-      gradient: "from-violet-400 to-purple-400",
-      shadowColor: "shadow-violet-200",
-    },
-    {
-      id: 4,
-      title: "Patient Care Excellence",
-      description: "Advanced patient care and experience optimization",
-      expertise: ["Patient Experience", "Care Protocols", "Quality Metrics"],
-      members: 56,
-      rating: 4.9,
-      gradient: "from-emerald-400 to-teal-400",
-      shadowColor: "shadow-emerald-200",
-    },
-    {
-      id: 5,
-      title: "Medical Education",
-      description: "Training and development in healthcare",
-      expertise: ["Clinical Training", "Medical Education", "Skill Development"],
-      members: 39,
-      rating: 4.8,
-      gradient: "from-amber-400 to-yellow-400",
-      shadowColor: "shadow-amber-200",
-    },
-    {
-      id: 6,
-      title: "Healthcare Strategy",
-      description: "Strategic planning and healthcare management",
-      expertise: ["Strategic Planning", "Healthcare Policy", "Operations"],
-      members: 31,
-      rating: 4.7,
-      gradient: "from-pink-400 to-rose-400",
-      shadowColor: "shadow-pink-200",
-    },
-  ]
 
   const handleDayChange = (day) => {
     setFormData((prev) => ({
@@ -438,7 +417,7 @@ export default function DoctorRegistrationForm() {
           transition={{ delay: 0.3 }}
         >
           <div className="p-6 sm:p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={()=>handleSubmit()} className="space-y-6">
               <AnimatePresence mode="wait">
                 {currentStep === 1 && (
                   <motion.div
@@ -449,8 +428,12 @@ export default function DoctorRegistrationForm() {
                     className="space-y-6"
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <InputWrapper label="Title" required name="title">
+                      <div className="space-y-1">
+                        <Label htmlFor="title" className="text-sm font-medium">
+                          Title <span className="text-red-500">*</span>
+                        </Label>
                         <select
+                          id="title"
                           name="title"
                           value={formData.title}
                           onChange={handleInputChange}
@@ -470,11 +453,15 @@ export default function DoctorRegistrationForm() {
                           <option value="Prof">Prof.</option>
                           <option value="Assoc">Assoc. Prof.</option>
                         </select>
-                      </InputWrapper>
+                        {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title}</p>}
+                      </div>
 
-                      <InputWrapper label="First Name" required name="firstName">
-                        <input
-                          type="text"
+                      <div className="space-y-1">
+                        <Label htmlFor="firstName" className="text-sm font-medium">
+                          First Name <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="firstName"
                           name="firstName"
                           value={formData.firstName}
                           onChange={handleInputChange}
@@ -489,16 +476,19 @@ export default function DoctorRegistrationForm() {
                           } focus:outline-none transition-all duration-200`}
                           required
                         />
-                        
-                      
-                      </InputWrapper>
+                        {errors.firstName && <p className="mt-1 text-sm text-red-500">{errors.firstName}</p>}
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <InputWrapper label="Email" required name="email">
-                        <input
-                          type="email"
+                      <div className="space-y-1">
+                        <Label htmlFor="email" className="text-sm font-medium">
+                          Email <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="email"
                           name="email"
+                          type="email"
                           value={formData.email}
                           onChange={handleInputChange}
                           onFocus={() => handleInputFocus("email")}
@@ -512,12 +502,17 @@ export default function DoctorRegistrationForm() {
                           } focus:outline-none transition-all duration-200`}
                           required
                         />
-                      </InputWrapper>
+                        {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
+                      </div>
 
-                      <InputWrapper label="Phone" required name="phone">
-                        <input
-                          type="tel"
+                      <div className="space-y-1">
+                        <Label htmlFor="phone" className="text-sm font-medium">
+                          Phone <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="phone"
                           name="phone"
+                          type="tel"
                           value={formData.phone}
                           onChange={handleInputChange}
                           onFocus={() => handleInputFocus("phone")}
@@ -531,7 +526,8 @@ export default function DoctorRegistrationForm() {
                           } focus:outline-none transition-all duration-200`}
                           required
                         />
-                      </InputWrapper>
+                        {errors.phone && <p className="mt-1 text-sm text-red-500">{errors.phone}</p>}
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -545,8 +541,12 @@ export default function DoctorRegistrationForm() {
                     className="space-y-6"
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <InputWrapper label="Specialization" required name="specialization">
+                      <div className="space-y-1">
+                        <Label htmlFor="specialization" className="text-sm font-medium">
+                          Specialization <span className="text-red-500">*</span>
+                        </Label>
                         <select
+                          id="specialization"
                           name="specialization"
                           value={formData.specialization}
                           onChange={handleInputChange}
@@ -567,12 +567,17 @@ export default function DoctorRegistrationForm() {
                           <option value="pediatrics">Pediatrics</option>
                           <option value="orthopedics">Orthopedics</option>
                         </select>
-                      </InputWrapper>
+                        {errors.specialization && <p className="mt-1 text-sm text-red-500">{errors.specialization}</p>}
+                      </div>
 
-                      <InputWrapper label="Years of Experience" required name="experience">
-                        <input
-                          type="number"
+                      <div className="space-y-1">
+                        <Label htmlFor="experience" className="text-sm font-medium">
+                          Years of Experience <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="experience"
                           name="experience"
+                          type="number"
                           value={formData.experience}
                           onChange={handleInputChange}
                           onFocus={() => handleInputFocus("experience")}
@@ -587,14 +592,19 @@ export default function DoctorRegistrationForm() {
                           required
                           min="0"
                         />
-                      </InputWrapper>
+                        {errors.experience && <p className="mt-1 text-sm text-red-500">{errors.experience}</p>}
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <InputWrapper label="Hourly Rate ($)" required name="hourlyRate">
-                        <input
-                          type="number"
+                      <div className="space-y-1">
+                        <Label htmlFor="hourlyRate" className="text-sm font-medium">
+                          Hourly Rate ($) <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="hourlyRate"
                           name="hourlyRate"
+                          type="number"
                           value={formData.hourlyRate}
                           onChange={handleInputChange}
                           onFocus={() => handleInputFocus("hourlyRate")}
@@ -610,12 +620,17 @@ export default function DoctorRegistrationForm() {
                           min="0"
                           step="0.01"
                         />
-                      </InputWrapper>
+                        {errors.hourlyRate && <p className="mt-1 text-sm text-red-500">{errors.hourlyRate}</p>}
+                      </div>
 
-                      <InputWrapper label="Designation" required name="designation">
-                        <input
-                          type="text"
+                      <div className="space-y-1">
+                        <Label htmlFor="designation" className="text-sm font-medium">
+                          Designation <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="designation"
                           name="designation"
+                          type="text"
                           value={formData.designation}
                           onChange={handleInputChange}
                           onFocus={() => handleInputFocus("designation")}
@@ -628,13 +643,17 @@ export default function DoctorRegistrationForm() {
                           required
                           placeholder="e.g. Senior Consultant, Head of Department"
                         />
-                      </InputWrapper>
+                      </div>
                     </div>
 
-                    <InputWrapper label="Medical License Number" required name="license">
-                      <input
-                        type="text"
+                    <div className="space-y-1">
+                      <Label htmlFor="license" className="text-sm font-medium">
+                        Medical License Number <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="license"
                         name="license"
+                        type="text"
                         value={formData.license}
                         onChange={handleInputChange}
                         onFocus={() => handleInputFocus("license")}
@@ -648,12 +667,17 @@ export default function DoctorRegistrationForm() {
                         } focus:outline-none transition-all duration-200`}
                         required
                       />
-                    </InputWrapper>
+                      {errors.license && <p className="mt-1 text-sm text-red-500">{errors.license}</p>}
+                    </div>
 
-                    <InputWrapper label="Current Hospital/Clinic" name="hospital">
-                      <input
-                        type="text"
+                    <div className="space-y-1">
+                      <Label htmlFor="hospital" className="text-sm font-medium">
+                        Current Hospital/Clinic
+                      </Label>
+                      <Input
+                        id="hospital"
                         name="hospital"
+                        type="text"
                         value={formData.hospital}
                         onChange={handleInputChange}
                         onFocus={() => handleInputFocus("hospital")}
@@ -662,9 +686,12 @@ export default function DoctorRegistrationForm() {
                           focusedField === "hospital" ? "border-indigo-500 ring-2 ring-indigo-200" : "border-gray-300"
                         } focus:outline-none transition-all duration-200`}
                       />
-                    </InputWrapper>
+                    </div>
 
-                    <InputWrapper label="Available Days" required>
+                    <div className="space-y-1">
+                      <Label className="text-sm font-medium">
+                        Available Days <span className="text-red-500">*</span>
+                      </Label>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
                         {Object.keys(formData.availableDays).map((day) => (
                           <div key={day} className="flex items-center">
@@ -681,7 +708,7 @@ export default function DoctorRegistrationForm() {
                           </div>
                         ))}
                       </div>
-                    </InputWrapper>
+                    </div>
                   </motion.div>
                 )}
 
@@ -693,7 +720,10 @@ export default function DoctorRegistrationForm() {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-6"
                   >
-                    <InputWrapper label="Select Your Expertise Category" required name="category">
+                    <div className="space-y-1">
+                      <Label className="text-sm font-medium">
+                        Select Your Expertise Category <span className="text-red-500">*</span>
+                      </Label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                         {categories.map((category) => (
                           <div
@@ -763,7 +793,7 @@ export default function DoctorRegistrationForm() {
                           </div>
                         ))}
                       </div>
-                    </InputWrapper>
+                    </div>
                   </motion.div>
                 )}
 
@@ -775,7 +805,10 @@ export default function DoctorRegistrationForm() {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-6"
                   >
-                    <InputWrapper label="Profile Photo" required name="image">
+                    <div className="space-y-1">
+                      <Label htmlFor="image" className="text-sm font-medium">
+                        Profile Photo <span className="text-red-500">*</span>
+                      </Label>
                       <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg border-gray-300 hover:border-indigo-500 transition-colors duration-200">
                         <div className="space-y-1 text-center">
                           <svg
@@ -812,9 +845,13 @@ export default function DoctorRegistrationForm() {
                           <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
                         </div>
                       </div>
-                    </InputWrapper>
+                      {errors.image && <p className="mt-1 text-sm text-red-500">{errors.image}</p>}
+                    </div>
 
-                    <InputWrapper label="Medical License Document" required name="documents">
+                    <div className="space-y-1">
+                      <Label htmlFor="documents" className="text-sm font-medium">
+                        Medical License Document <span className="text-red-500">*</span>
+                      </Label>
                       <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg border-gray-300 hover:border-indigo-500 transition-colors duration-200">
                         <div className="space-y-1 text-center">
                           <svg
@@ -825,7 +862,7 @@ export default function DoctorRegistrationForm() {
                             aria-hidden="true"
                           >
                             <path
-                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
                               strokeWidth={2}
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -851,7 +888,8 @@ export default function DoctorRegistrationForm() {
                           <p className="text-xs text-gray-500">PDF, DOC up to 10MB</p>
                         </div>
                       </div>
-                    </InputWrapper>
+                      {errors.documents && <p className="mt-1 text-sm text-red-500">{errors.documents}</p>}
+                    </div>
 
                     <div className="flex items-center">
                       <input
@@ -886,45 +924,46 @@ export default function DoctorRegistrationForm() {
                   </button>
                 )}
                 <div className="ml-auto">
-                  {currentStep < 4 ? (
-                    <button
-                      type="button"
-                      onClick={nextStep}
-                      className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
-                    >
-                      Next Step
-                    </button>
-                  ) : (
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          Processing...
-                        </>
-                      ) : (
-                        "Complete Registration"
-                      )}
-                    </button>
-                  )}
-                </div>
+  {currentStep < 4 ? (
+    <button
+      type="button"
+      onClick={(e)=>nextStep(e)}
+      className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02]"
+    >
+      Next Step
+    </button>
+  ) : (
+    <button
+      type="submit"
+      disabled={isSubmitting}
+      onClick={handleSubmit}
+      className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+    >
+      {isSubmitting ? (
+        <>
+          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Processing...
+        </>
+      ) : (
+        "Complete Registration"
+      )}
+    </button>
+  )}
+</div>
               </div>
             </form>
           </div>
