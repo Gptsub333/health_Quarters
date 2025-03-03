@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import Input from "@/components/ui/input"
 import { useForm } from "react-hook-form"
-import emailjs from "emailjs-com";
+// import emailjs from "emailjs-com";
 
 
 const cn = (...classes) => {
